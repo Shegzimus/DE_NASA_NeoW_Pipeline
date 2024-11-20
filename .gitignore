@@ -1,0 +1,6 @@
+venv/
+airflow/.google
+terraform/.terraform
+airflow/utils/__pycache__
+airflow/pipelines/__pycache__
+airflow/dags/__pycache__
