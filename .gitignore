@@ -1,6 +1,13 @@
 venv/
 airflow/.google
-terraform/.terraform
+
 airflow/utils/__pycache__
 airflow/pipelines/__pycache__
 airflow/dags/__pycache__
+airflow/config/secrets.conf
+
+
+
+
+terraform/.terraform
+terraform/nasa-neows-c12d19292fad.json
