@@ -1,15 +1,15 @@
-# Cosmic Data Pipeline: Efficient NASA Data Processing and Storage
-
 # Table of Contents
 
-- [Cosmic Data Pipeline: Efficient NASA Data Processing and Storage](#cosmic-data-pipeline-efficient-nasa-data-processing-and-storage)
 - [Table of Contents](#table-of-contents)
+  - [Cosmic Data Pipeline: Efficient NASA Data Processing and Storage](#cosmic-data-pipeline-efficient-nasa-data-processing-and-storage)
   - [Motivation](#motivation)
   - [Overview](#overview)
   - [Architecture](#architecture)
   - [New Personal Insights](#new-personal-insights)
   - [Prerequisites](#prerequisites)
   - [System Configuration](#system-configuration)
+
+## Cosmic Data Pipeline: Efficient NASA Data Processing and Storage
 
 
 ## Motivation
