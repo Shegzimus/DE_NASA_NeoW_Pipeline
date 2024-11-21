@@ -13,7 +13,7 @@
 
 
 ## Motivation
-I'm going to build a pipeline that efficiently moves and stores NASA's Near Earth Object Web Service Data on GCP. The goal is to ensure quick access to valuable space data. I'm keen to practice better pipeline security by using a new way to store pipeline secrets. I want to use Docker Hub and Cloud Run to make the solution's Docker image publicly accessible to friends and potential clients.
+I'm going to build a pipeline that efficiently moves and stores NASA's Near Earth Object Web Service Data on GCP. The schedule will be weekly and will show the sizes, classes and speed of asteroids that travelled near Earth. I want to practice better pipeline security by using *.conf file to store pipeline secrets. I want to use Docker Hub and Cloud Run to provision the pipeline and it's vizualizations.
 
 ## Overview
 This pipeline is designed to:
