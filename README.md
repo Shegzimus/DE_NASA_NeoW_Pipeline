@@ -1,7 +1,7 @@
 # Table of Contents
 
 - [Table of Contents](#table-of-contents)
-  - [Cosmic Data Pipeline: Efficient NASA Data Processing and Storage](#cosmic-data-pipeline-efficient-nasa-data-processing-and-storage)
+  - [Asteroid Data Pipeline: Efficient NASA Data Processing and Storage](#asteroid-data-pipeline-efficient-nasa-data-processing-and-storage)
   - [Motivation](#motivation)
   - [Overview](#overview)
   - [Architecture](#architecture)
@@ -9,7 +9,7 @@
   - [Prerequisites](#prerequisites)
   - [System Configuration](#system-configuration)
 
-## Cosmic Data Pipeline: Efficient NASA Data Processing and Storage
+## Asteroid Data Pipeline: Efficient NASA Data Processing and Storage
 
 
 ## Motivation
