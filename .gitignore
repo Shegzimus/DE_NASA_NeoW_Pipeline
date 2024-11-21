@@ -14,3 +14,7 @@ terraform/nasa-neows-c12d19292fad.json
 
 
 airflow/pipelines/lab.py
+airflow/pipelines/2nd_lab.py
+
+airflow/data/input
+airflow/data/output
