@@ -2,7 +2,7 @@ import configparser
 import sys
 import os
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Create a configparser object
 config = configparser.ConfigParser()
@@ -17,6 +17,10 @@ gcs_project_id = config['GCS']['gcs_project_id']
 bigquery_project_id = config['BigQuery']['bigquery_project_id']
 bigquery_dataset = config['BigQuery']['bigquery_dataset']
 
-# Print the secrets (avoid printing sensitive data in real applications)
-# print(f"NASA API Key: {nasa_api_key}")
-# print(f"GCS Bucket: {gcs_bucket}")
+# URLs
+# neo_feed =f'https://api.nasa.gov/neo/rest/v1/feed?start_date={START_DATE}&end_date={END_DATE}&api_key={API_KEY}'
+# neo_lookup = f'https://api.nasa.gov/neo/rest/v1/neo/{ASTEROID_ID}?api_key={API_KEY}'
+# neo_browse = f'https://api.nasa.gov/neo/rest/v1/neo/browse?api_key={API_KEY}'
+
+
+OUTPUT_PATH = 'airflow/data/input/neo_data.csv'
