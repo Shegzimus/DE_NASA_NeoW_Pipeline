@@ -37,4 +37,11 @@
 - I'm not sure if I should leave this process to the transformation pipeline or just have it happen during extraction.
 - I need to figure out a way to name each data batch uniquely so that each stream will not overright the local and GCS bucket files.
 
-
+## [2024-11-22]
+**Time**: `03:54 PM`
+- I've been able to write a function to generate the time window the GET request needs, based on when the function from the weekly dag is executed
+- This pipeline will need two flows/jobs: One for processing historical data and one for processing subsequent weekly batches.
+- The load DAG of first job will send historic data to the GCS bucket while the next load DAG of the second job will also upload to the GCS bucket but will additionally append new data to BQ Dataset. 
+- I have to put in idempotency checks to ensure coherence and also avoid data gaps.
+- A task for an API test will be necessary for the batch stream job. While it isn't for the first.
+- I still don't know how I will handle the logs. I need to figure out a balance between best-practice and functionality.
