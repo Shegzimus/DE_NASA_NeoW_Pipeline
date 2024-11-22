@@ -3,11 +3,8 @@ import sys
 import requests
 from datetime import datetime, timedelta
 import pandas as pd
-from ast import literal_eval
 import json
-import requests
 import pandas as pd
-import pyarrow as pq
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
