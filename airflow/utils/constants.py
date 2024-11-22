@@ -29,6 +29,6 @@ LOCAL_INPUT_PATH = 'airflow/data/input'
 
 # Paths for production 
 
-AIRFLOW_OUTPUT_PATH = config['file_paths']['output_path']
+OUTPUT_PATH = config['file_paths']['output_path']
 
-AIRFLOW_INPUT_PATH = config['file_paths']['input_path']
+INPUT_PATH = config['file_paths']['input_path']
