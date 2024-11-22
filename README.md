@@ -2,7 +2,7 @@
 
 - [Table of Contents](#table-of-contents)
   - [Asteroid Data Pipeline: Efficient NASA Data Processing and Storage](#asteroid-data-pipeline-efficient-nasa-data-processing-and-storage)
-  - [Motivation](#motivation)
+  - [Motivation and Objectives](#motivation-and-objectives)
   - [Overview](#overview)
   - [Architecture](#architecture)
   - [New Personal Insights](#new-personal-insights)
@@ -12,11 +12,11 @@
 ## Asteroid Data Pipeline: Efficient NASA Data Processing and Storage
 
 
-## Motivation
-I'm going to build a pipeline that efficiently moves and stores NASA's Near Earth Object Web Service Data on GCP. The schedule will be weekly and will show the sizes, classes and speed of asteroids that travelled near Earth. I want to practice better pipeline security by using *.conf file to store pipeline secrets. I want to use Docker Hub and Cloud Run to provision the pipeline and it's vizualizations.
+## Motivation and Objectives
+I'm going to build a pipeline that efficiently moves and stores NASA's Near Earth Object Web Service Data on GCP. The schedule will be weekly and will show the sizes, classes and speed of asteroids that travelled near Earth. I want to practice better pipeline security by using *.conf file to store pipeline secrets. I want to use Docker Hub and Cloud Run to provision the pipeline and it's vizualizations. I finally want to add some logging mechanism to the pipeline.
 
 ## Overview
-This pipeline is designed to:
+
 
 
 ## Architecture
