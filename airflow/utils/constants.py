@@ -22,5 +22,13 @@ bigquery_dataset = config['BigQuery']['bigquery_dataset']
 # neo_lookup = f'https://api.nasa.gov/neo/rest/v1/neo/{ASTEROID_ID}?api_key={API_KEY}'
 # neo_browse = f'https://api.nasa.gov/neo/rest/v1/neo/browse?api_key={API_KEY}'
 
+# Paths for testing
+LOCAL_OUTPUT_PATH = 'airflow/data/output'
 
-OUTPUT_PATH = 'airflow/data/input/neo_data.csv'
+LOCAL_INPUT_PATH = 'airflow/data/input'
+
+# Paths for production 
+
+AIRFLOW_OUTPUT_PATH = config['file_paths']['output_path']
+
+AIRFLOW_INPUT_PATH = config['file_paths']['input_path']
