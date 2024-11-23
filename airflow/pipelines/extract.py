@@ -11,6 +11,51 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from utils.constants import nasa_api_key, INPUT_PATH, OUTPUT_PATH
 
 
+def generate_time_range(execution_date: datetime) -> tuple[str, str, str]:
+    """
+    This function generates a date range based on the given execution date.
+    It calculates the start and end dates for a week before the execution date,
+    and formats these dates for use in file names.
+
+    Parameters:
+    execution_date (datetime): The date for which the time range is to be generated.
+
+    Returns:
+    tuple: A tuple containing three strings:
+           - The start date in the format 'YYYY-MM-DD'.
+           - The end date in the format 'YYYY-MM-DD'.
+           - The file postfix in the format 'YYYYMMDD_YYYYMMDD'.
+    """
+    # Calculate the end date (day before execution_date)
+    end_date = execution_date - timedelta(days=1)
+    # Calculate the start date (7 days before the end date)
+    start_date = end_date - timedelta(days=6)
+
+    # Format the dates for the file postfix
+    start_date_str = start_date.strftime("%Y-%m-%d")
+    end_date_str = end_date.strftime("%Y-%m-%d")
+    file_postfix = f"{start_date.strftime('%Y%m%d')}_{end_date.strftime('%Y%m%d')}"
+
+    return start_date_str, end_date_str, file_postfix
+
+def test_api_call():
+    today_date = datetime.now()
+    START_DATE, END_DATE, file_postfix = generate_time_range(today_date)
+    url = f"https://api.nasa.gov/neo/rest/v1/feed?start_date={START_DATE}&end_date={END_DATE}&api_key={nasa_api_key}"
+    
+    # Make the API call
+    response = requests.get(url)
+    
+    # Raise an exception if the status code is not 200
+    if response.status_code != 200:
+        raise ValueError(f"API request failed with status code: {response.status_code}")
+    else:
+        print("API request was successful!")
+        print(f"Response: {response.text}")
+
+
+
+
 def test_api_neo_feed(START_DATE: datetime, END_DATE: datetime, API_KEY: str) -> json:
     """
     This function sends a request to the NASA NEO (Near-Earth Objects) API to fetch data for a given date range.
@@ -33,32 +78,6 @@ def test_api_neo_feed(START_DATE: datetime, END_DATE: datetime, API_KEY: str) ->
 
 
 
-def generate_time_range(execution_date: datetime) -> tuple[datetime, datetime, str]:
-    """
-    This function generates a date range based on the given execution date.
-    It calculates the start and end dates for a week before the execution date,
-    and formats these dates for use in file names.
-
-    Parameters:
-    execution_date (datetime): The date for which the time range is to be generated.
-
-    Returns:
-    tuple: A tuple containing three strings:
-           - The start date in the format 'YYYY-MM-DD'.
-           - The end date in the format 'YYYY-MM-DD'.
-           - The file postfix in the format 'YYYYMMDD_YYYYMMDD'.
-    """
-    # Calculate the end date (day before execution_date)
-    end_date = (execution_date - timedelta(days=1)).strftime("%Y-%m-%d")
-    # Calculate the start date (7 days before the end date)
-    start_date = (execution_date - timedelta(days=7)).strftime("%Y-%m-%d")
-
-    # Format the dates for the file postfix
-    start_of_week = (execution_date - timedelta(days=7)).strftime("%Y%m%d")
-    end_of_week = (execution_date - timedelta(days=1)).strftime("%Y%m%d")
-
-    file_postfix = f"{start_of_week}_{end_of_week}"
-    return start_date, end_date, file_postfix
 
 
 def extract_dataframe_from_response(data: json) -> pd.json_normalize:
