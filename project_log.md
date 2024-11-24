@@ -45,3 +45,9 @@
 - I have to put in idempotency checks to ensure coherence and also avoid data gaps.
 - A task for an API test will be necessary for the batch stream job. While it isn't for the first.
 - I still don't know how I will handle the logs. I need to figure out a balance between best-practice and functionality.
+
+## [2024-11-23]
+**Time**: `09:18 PM`
+- I tried writing tests for the extract functions. I successfully did this for the generate_date and api test functions. The extract_data_frame_from_response function proves elusive. I will postpone that for now and continue working on the transform functions.
+- Testing is honestly boring but I must persevere as it's a requirement for professional developers. In a way, it bullet proofs your code such that you don't have to execute functions repeatedly just to test how it works. This is useful since spinning up containers to test functions may not be best practice. Containers should only be tested in performance contexts.
+- There is another URL for the same API that I can use to extract a table specically for Asteroid names. I can join this for a more robust data structure.
