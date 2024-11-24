@@ -49,5 +49,31 @@
 ## [2024-11-23]
 **Time**: `09:18 PM`
 - I tried writing tests for the extract functions. I successfully did this for the generate_date and api test functions. The extract_data_frame_from_response function proves elusive. I will postpone that for now and continue working on the transform functions.
-- Testing is honestly boring but I must persevere as it's a requirement for professional developers. In a way, it bullet proofs your code such that you don't have to execute functions repeatedly just to test how it works. This is useful since spinning up containers to test functions may not be best practice. Containers should only be tested in performance contexts.
+- Testing is not very fun but it's a requirement for professional development. In a way, it bullet-proofs your code such that you don't have to execute functions repeatedly just to test how it works. This is useful since spinning up containers to test functions may not be best practice. Containers should only be tested in performance contexts.
 - There is another URL for the same API that I can use to extract a table specically for Asteroid names. I can join this for a more robust data structure.
+
+
+## [2024-11-24]
+**Time**: `04:22 AM`
+- I've been able to write some functions to extract the asteroid names table. The API response only holds 20 rows in a page. So I need to paginate through the entire dataset.
+
+- I'm dealing with 1.8k pages and using tqdm, I can see that it will take an hour to complete. Installing Spark seems like an overkill just for the extraction of the historic batch. 
+
+- I need to figure out other ways to optimize the flow of this particular task. My options are chunking, parallel processing and Dask.
+
+
+**Time**: `05:04 AM`
+- The test task is done. The single file is 472mb with over a million rows and 38 columns. The data is astonishing.
+
+- There is a link.self column that has the API key in each row. I should deal with this during the fetch process as it will be memory intensive to parse a million rows with pandas before performing these changes.
+
+- I will also remove the approach column that has dictionaries as entries. Perhaps making schema changes shouldn't require too much memory after this.
+
+- I still can't believe that I have a dataset of every single asteroid discovered and named by mankind. Along with the dates of discovery and when they're expected to approach earth. The analytics potential is incredible.
+
+- When I wake up, I will try to paginate the NEO feed URL. Maybe there's more data available per week than I thought.
+
+- I will have two output data formats: CSV and Parquet. In case a member would like CSV access to the raw data.
+
+- Considering that I will be uploaded historic NEO feed data to GCS, and potentially partition or cluster the data, I wonder if it will be better to download multiple CSV/Parquet files for each week versus combining them into one CSV/Parquet file.
+
