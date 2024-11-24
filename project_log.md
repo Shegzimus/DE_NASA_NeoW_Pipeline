@@ -74,3 +74,10 @@
 - I have decided to use Google Cloud Functions and Scheduler instead of Airflow and Docker. 
 - I will provision and configure all the solution components using Terraform.
 - I will attempt to calculate the cost variance along with the functional benefits of this option, versus using Airflow mit Docker.
+
+**Time**: `07:25 AM`
+- I have been refactoring the Terraform config to cater to my new decision
+- I just learned that the amount of infrastructure you can provision as code is massive.
+- Terraform impresses by being able to not only provision everything the workflow will need to execute (in crazy detail), but it can look at your local directory and even a repository and ship your codes automatically into the google bucket.
+- I can even use Terraform to make Cloud Function pip install required packages from a requirements.txt file.
+- I have definitely learned something new about Terraform.
