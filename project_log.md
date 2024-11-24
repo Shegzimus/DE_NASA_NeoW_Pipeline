@@ -67,5 +67,5 @@
 - I still can't believe that I have a dataset of every single asteroid discovered and named by mankind. Along with the dates of discovery and when they're expected to approach earth. The analytics potential is incredible.
 - When I wake up, I will try to paginate the NEO feed URL. Maybe there's more data available per week than I thought.
 - I will have two output data formats: CSV and Parquet. In case a member would like CSV access to the raw data.
-- Considering that I will be uploaded historic NEO feed data to GCS, and potentially partition or cluster the data, I wonder if it will be better to download multiple CSV/Parquet files for each week versus combining them into one CSV/Parquet file.
+- Considering that I will be uploading historic NEO feed data to GCS, and potentially partition or cluster the data, I wonder if it will be better to download multiple CSV/Parquet files for each week versus combining them into one CSV/Parquet file.
 
