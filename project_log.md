@@ -69,3 +69,8 @@
 - I will have two output data formats: CSV and Parquet. In case a member would like CSV access to the raw data.
 - Considering that I will be uploading historic NEO feed data to GCS, and potentially partition or cluster the data, I wonder if it will be better to download multiple CSV/Parquet files for each week versus combining them into one CSV/Parquet file.
 
+
+**Time**: `06:27 AM`
+- I have decided to use Google Cloud Functions and Scheduler instead of Airflow and Docker. 
+- I will provision and configure these solution components using Terraform.
+- I will attempt to calculate the cost variance along with the functional benefits of this option, versus using Airflow mit Docker.
