@@ -4,11 +4,13 @@ import requests
 from datetime import datetime
 import sys
 import os
+import pandas as pd
+
 
 # Add the parent directory to the system path to import functions for testing purposes
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from pipelines.extract import generate_time_range, test_api_call
+from pipelines.extract import generate_time_range, test_api_call, extract_dataframe_from_response
 from utils.constants import nasa_api_key
 
 def test_generate_time_range():
@@ -67,3 +69,67 @@ def test_api_call_failure(mock_get):
     # Test the failure case (exception should be raised)
     with pytest.raises(ValueError, match="API request failed with status code: 500"):
         test_api_call()
+
+
+
+
+def test_extract_dataframe_from_response():
+    # Mock JSON response
+    mock_response = {
+        "near_earth_objects": {
+            "2024-11-23": [
+                {
+                    "id": "1",
+                    "name": "Asteroid 1",
+                    "estimated_diameter": {
+                        "kilometers": {"estimated_diameter_min": 0.1, "estimated_diameter_max": 0.3}
+                    },
+                    "is_potentially_hazardous_asteroid": True
+                },
+                {
+                    "id": "2",
+                    "name": "Asteroid 2",
+                    "estimated_diameter": {
+                        "kilometers": {"estimated_diameter_min": 0.05, "estimated_diameter_max": 0.2}
+                    },
+                    "is_potentially_hazardous_asteroid": False
+                }
+            ],
+            "2024-11-24": [
+                {
+                    "id": "3",
+                    "name": "Asteroid 3",
+                    "estimated_diameter": {
+                        "kilometers": {"estimated_diameter_min": 0.15, "estimated_diameter_max": 0.4}
+                    },
+                    "is_potentially_hazardous_asteroid": True
+                }
+            ]
+        }
+    }
+
+    # Call the function
+    df = extract_dataframe_from_response(mock_response)
+
+    # Expected DataFrame columns
+    expected_columns = [
+        "id",
+        "name",
+        "estimated_diameter.kilometers.estimated_diameter_min",
+        "estimated_diameter.kilometers.estimated_diameter_max",
+        "is_potentially_hazardous_asteroid",
+        "close_approach_date"
+    ]
+
+    # Verify the output DataFrame
+    assert isinstance(df, pd.DataFrame), "Output is not a pandas DataFrame"
+    assert list(df.columns) == expected_columns, f"Expected columns {expected_columns}, but got {list(df.columns)}"
+    assert len(df) == 3, f"Expected 3 rows in the DataFrame, but got {len(df)}"
+    assert df["close_approach_date"].iloc[0] == "2024-11-23", "The close_approach_date column has incorrect values"
+    assert df["close_approach_date"].iloc[-1] == "2024-11-24", "The close_approach_date column has incorrect values"
+
+    # Validate one row
+    asteroid_1 = df[df["id"] == "1"]
+    assert not asteroid_1.empty, "Asteroid 1 is missing in the DataFrame"
+    assert asteroid_1["name"].iloc[0] == "Asteroid 1", "Asteroid 1's name is incorrect"
+    assert asteroid_1["is_potentially_hazardous_asteroid"].iloc[0] is True, "Asteroid 1 hazard status is incorrect"
