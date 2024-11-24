@@ -5,11 +5,16 @@ from datetime import datetime, timedelta
 import pandas as pd
 import json
 import pandas as pd
+from tqdm import tqdm
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from utils.constants import nasa_api_key, INPUT_PATH, OUTPUT_PATH
 
+"""
+NEO FEED EXTRACTORS
+
+"""
 
 def generate_time_range(execution_date: datetime) -> tuple[str, str, str]:
     """
@@ -54,8 +59,6 @@ def test_api_call():
         print(f"Response: {response.text}")
 
 
-
-
 def test_api_neo_feed(START_DATE: datetime, END_DATE: datetime, API_KEY: str) -> json:
     """
     This function sends a request to the NASA NEO (Near-Earth Objects) API to fetch data for a given date range.
@@ -75,9 +78,6 @@ def test_api_neo_feed(START_DATE: datetime, END_DATE: datetime, API_KEY: str) ->
     response = requests.get(url)
     assert response.status_code == 200, f"API request failed with status code {response.status_code}: {response.text}"
     return response.json()
-
-
-
 
 
 def extract_dataframe_from_response(data: json) -> pd.json_normalize:
@@ -209,3 +209,59 @@ def extract_neo_data_raw(execution_date: datetime) -> None:
         print(f"Data successfully saved to {output_file}")
     except Exception as e:
         print(f"Error saving DataFrame to Parquet: {e}")
+
+
+"""
+FULL ASTEROID DATA EXTRACTORS
+
+"""
+def fetch_all_pages_with_progress() -> list:
+    """
+    Fetches all paginated data from the NASA NEO (Near-Earth Objects) API.
+    It uses a progress bar to track the fetching process.
+
+    Returns:
+    list: A list containing all the fetched data from all pages.
+
+    Raises:
+    requests.exceptions.HTTPError: If an HTTP error occurs during the API request.
+    """
+    all_data = []  # To collect data from all pages
+    next_url = f"http://api.nasa.gov/neo/rest/v1/neo/browse?api_key={nasa_api_key}"  # Start with the first page
+
+    # Get the total number of pages to track progress
+    initial_response = requests.get(next_url)
+    initial_response.raise_for_status()
+    total_pages = initial_response.json().get("page", {}).get("total_pages", 1)
+
+    # Initialize progress bar
+    with tqdm(total=total_pages, desc="Fetching Pages", unit="page") as pbar:
+        while next_url:
+            response = requests.get(next_url)
+            response.raise_for_status()  # Raise an exception for HTTP errors
+            data = response.json()
+
+            # Append current page's data
+            all_data.extend(data.get("near_earth_objects", []))
+
+            # Get the URL for the next page (if any)
+            next_url = data.get("links", {}).get("next")
+
+            # Update progress bar
+            pbar.update(1)
+
+    return all_data
+
+
+
+def extract_and_save_ast_data() -> None:
+    # Fetch all paginated data
+    all_asteroid_data = fetch_all_pages_with_progress()
+
+    # Convert to DataFrame
+    df = pd.json_normalize(all_asteroid_data)
+
+    # Save to CSV
+    filepath = "airflow/data/input/neo_browse_asteroid_data.csv"
+    df.to_csv(filepath, index=False)
+    print(f"Saved {len(df)} entries to {filepath}")
