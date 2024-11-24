@@ -72,5 +72,5 @@
 
 **Time**: `06:27 AM`
 - I have decided to use Google Cloud Functions and Scheduler instead of Airflow and Docker. 
-- I will provision and configure these solution components using Terraform.
+- I will provision and configure all the solution components using Terraform.
 - I will attempt to calculate the cost variance along with the functional benefits of this option, versus using Airflow mit Docker.
