@@ -81,3 +81,12 @@
 - Terraform impresses by being able to not only provision everything the workflow will need to execute (in crazy detail), but it can look at your local directory and even a repository and ship your codes automatically into the google bucket.
 - I can even use Terraform to make Cloud Function pip install required packages from a requirements.txt file.
 - I have definitely learned something new about Terraform.
+
+
+## [2024-11-24]
+**Time**: `05:15 AM`
+- I have decided to write two pipelines. One for historical ETL and another for Batch ETL.
+- To do this, I had to refactor the logic of the extraction functions for a historical use case.
+- The batch versions should be the same. 
+- Once I write those and their respective tests, I can move on to the transformation functions. I have mock data to work with.
+
