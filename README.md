@@ -10,7 +10,7 @@
 
 
 ## Motivation and Objectives
-I'm going to build a pipeline that efficiently moves and stores NASA's Near Earth Object Web Service Data on GCP. The schedule will be weekly and will show the sizes, classes and speed of asteroids that travelled near Earth. I want to practice better pipeline security by using *.conf file to store pipeline secrets. I want to use Docker Hub and Cloud Run to provision the pipeline and it's vizualizations. I finally want to add some logging mechanism to the pipeline.
+
 
 ## Overview
 
