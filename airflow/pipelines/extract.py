@@ -6,13 +6,13 @@ import pandas as pd
 import json
 import pandas as pd
 from tqdm import tqdm
-
+from typing import List, Tuple
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from utils.constants import nasa_api_key, INPUT_PATH, OUTPUT_PATH
+from utils.constants import nasa_api_key, INPUT_PATH
 
 """
-NEO FEED EXTRACTORS
+NEO FEED BATCH EXTRACTORS
 
 """
 
@@ -119,8 +119,8 @@ def extract_close_approach_column(execution_date: datetime) -> None:
     # Generate the time range and file postfix
     start_date, end_date, file_postfix = generate_time_range(execution_date)
 
-    # Ensure the output directory exists
-    os.makedirs(f"{INPUT_PATH}/close_approach_folder", exist_ok=True)
+    # Ensure the directory exists
+    os.makedirs("opt/airflow/data/input/batch/close_approach", exist_ok=True)
 
     # Fetch data from the API
     try:
@@ -159,16 +159,15 @@ def extract_close_approach_column(execution_date: datetime) -> None:
         print(f"Error while expanding close approach data: {e}")
         return
 
-    # Save the processed data to a Parquet file
-    output_file = f"{INPUT_PATH}/close_approach_folder/{file_postfix}.parquet"
+    # Save the processed data in CSV & Parquet formats
     try:
-        close_approach_df.to_parquet(output_file, index=False)
-        print(f"Close approach data successfully saved to {output_file}")
+        save_df_to_csv(df_extracted, file_postfix, 'opt/airflow/data/input/batch/close_approach/csv/')
+        save_df_to_parquet(df_extracted, file_postfix, 'opt/airflow/data/input/batch/close_approach/parquet/')
     except Exception as e:
         print(f"Error saving expanded data to Parquet: {e}")
 
 
-def extract_neo_data_raw(execution_date: datetime) -> None:
+def extract_batch_neo_data_raw(execution_date: datetime) -> None:
     """
     This function extracts raw data from the NASA NEO (Near-Earth Objects) API for a given execution date.
     It generates a date range based on the execution date, sends a request to the API, processes the response,
@@ -183,7 +182,8 @@ def extract_neo_data_raw(execution_date: datetime) -> None:
     """
     start_date, end_date, file_postfix = generate_time_range(execution_date)
 
-    os.makedirs(f"{INPUT_PATH}/neo_data_folder", exist_ok=True)
+    # Ensure the directory exists
+    os.makedirs("opt/airflow/data/input/batch/neo_feed", exist_ok=True)
 
     try:
         # Fetch data from NASA NEO API
@@ -202,20 +202,31 @@ def extract_neo_data_raw(execution_date: datetime) -> None:
         print(f"Error processing data into DataFrame: {e}")
         return
     
-    # Save the extracted DataFrame to a Parquet file
-    output_file = f"{INPUT_PATH}/neo_data_folder/raw_{file_postfix}.parquet"
+    # Save the processed data in CSV & Parquet formats
     try:
-        df_extracted.to_parquet(output_file, index=False)
-        print(f"Data successfully saved to {output_file}")
+        save_df_to_csv(df_extracted, file_postfix, 'opt/airflow/data/input/batch/neo_feed/csv/')
+        save_df_to_parquet(df_extracted, file_postfix, 'opt/airflow/data/input/batch/neo_feed/parquet/')
     except Exception as e:
         print(f"Error saving DataFrame to Parquet: {e}")
 
 
-"""
-FULL ASTEROID DATA EXTRACTORS
+
+
+
+
+
+
+
+
 
 """
-def fetch_all_pages_with_progress() -> list:
+HISTORICAL EXTRACTORS
+
+"""
+
+
+# =========================================  ASTEROID DATA ========================================================
+def fetch_all_ast_pages_with_progress() -> list:
     """
     Fetches all paginated data from the NASA NEO (Near-Earth Objects) API.
     It uses a progress bar to track the fetching process.
@@ -256,12 +267,126 @@ def fetch_all_pages_with_progress() -> list:
 
 def extract_and_save_ast_data() -> None:
     # Fetch all paginated data
-    all_asteroid_data = fetch_all_pages_with_progress()
+    all_asteroid_data = fetch_all_ast_pages_with_progress()
 
     # Convert to DataFrame
     df = pd.json_normalize(all_asteroid_data)
 
     # Save to CSV
-    filepath = "airflow/data/input/neo_browse_asteroid_data.csv"
+    
+    save_df_to_csv(df, file_postfix='neo_browse_asteroid_data', path= 'airflow/data/input/historical/asteroid_data/csv/')
+    save_df_to_parquet(df, file_postfix='neo_browse_asteroid_data', path= 'airflow/data/input/historical/asteroid_data/parquet/')
+    return
+
+
+# ========================================= NEO DATA ========================================================
+def generate_hist_ranges(start_datetime: str) -> List[Tuple[str, str, str]]:
+    """
+    Generate a list of weekly time ranges from the given start date to the current week.
+
+    Args:
+        start_datetime (str): The starting date in the format 'YYYYMMDD'.
+
+    Returns:
+        List[Tuple[str, str, str]]: A list of tuples, each containing:
+                                    - start_date_str (str): Start date of the week.
+                                    - end_date_str (str): End date of the week.
+                                    - file_postfix (str): A formatted string for file naming.
+    """
+    start_date = datetime.strptime(start_datetime, "%Y%m%d")
+    current_date = datetime.now()
+
+    time_ranges = []
+    while start_date <= current_date:
+        # Calculate the end of the current week
+        end_date = start_date + timedelta(days=6)
+        if end_date > current_date:
+            end_date = current_date  # Clip to the current date if in the last week
+        
+        # Convert dates to strings
+        start_date_str = start_date.strftime("%Y-%m-%d")
+        end_date_str = end_date.strftime("%Y-%m-%d")
+        file_postfix = f"{start_date_str.replace('-', '')}_{end_date_str.replace('-', '')}"
+
+        # Append the tuple
+        time_ranges.append((start_date_str, end_date_str, file_postfix))
+
+        # Move to the next week
+        start_date = end_date + timedelta(days=1)
+
+    return time_ranges
+
+
+def save_df_to_csv(df: pd.json_normalize, file_postfix: str, path: str)-> None:
+    """
+    Save the DataFrame to a CSV file.
+    """
+    filepath = f"{path}/{file_postfix}.csv"
     df.to_csv(filepath, index=False)
-    print(f"Saved {len(df)} entries to {filepath}")
+    return
+
+def save_df_to_parquet(df: pd.json_normalize, file_postfix: str, path: str)-> None:
+    """
+    Save the DataFrame to a Parquet file.
+    """
+    filepath = f"{path}/{file_postfix}.parquet"
+    df.to_parquet(filepath, index=False)
+    return
+
+
+def extract_hist_neo_data_raw(execution_date: datetime)-> None:
+    """
+    Extract raw data for all date ranges generated by generate_hist_ranges.
+    Saves the data for each date range as a CSV file.
+    """
+    # Generate all historical ranges
+    date_ranges = generate_hist_ranges(execution_date)
+
+    for start_date, end_date, file_postfix in date_ranges:
+        try:
+            # Fetch data from NASA NEO API
+            data = test_api_neo_feed(start_date, end_date, API_KEY=nasa_api_key)
+
+            # Process the API response into a DataFrame
+            df_extracted = extract_dataframe_from_response(data)
+
+            # Save the extracted data to a CSV and PQ files
+            save_df_to_csv(df_extracted, file_postfix, 'opt/airflow/data/input/historical/neo_feed/csv')
+            save_df_to_parquet(df_extracted, file_postfix,'opt/airflow/data/input/historical/neo_feed/parquet' )
+        except Exception as e:
+            print(f"Error processing data for range {start_date} to {end_date}: {e}")
+
+
+def extract_hist_close_approach(execution_date: datetime)-> None:
+    """
+    Extract and process close approach data for all date ranges generated by generate_hist_ranges.
+    Saves the processed data for each date range as a CSV file.
+    """
+    # Generate all historical ranges
+    date_ranges = generate_hist_ranges(execution_date)
+
+    for start_date, end_date, file_postfix in date_ranges:
+        try:
+            # Fetch data from NASA NEO API
+            data = test_api_neo_feed(start_date, end_date, API_KEY=nasa_api_key)
+
+            # Process the API response into a DataFrame
+            df_extracted = extract_dataframe_from_response(data)
+
+            # Expand close approach data
+            close_approach_expanded = []
+            for idx, row in df_extracted.iterrows():
+                for entry in row["close_approach_data"]:
+                    entry['id'] = row['id']  # Add reference ID
+                    entry.update(entry.pop('relative_velocity'))  # Flatten velocity data
+                    entry.update(entry.pop('miss_distance'))  # Flatten distance data
+                    close_approach_expanded.append(entry)
+
+            # Convert expanded data to a DataFrame
+            close_approach_df = pd.DataFrame(close_approach_expanded)
+
+            # Save the extracted data to CSV and PQ 
+            save_df_to_csv(close_approach_df, file_postfix, 'airflow\data\input\historical\close_approach\csv')
+            save_df_to_parquet(close_approach_df, file_postfix, 'airflow\data\input\historical\close_approach\parquet')
+        except Exception as e:
+            print(f"Error processing close approach data for range {start_date} to {end_date}: {e}")
