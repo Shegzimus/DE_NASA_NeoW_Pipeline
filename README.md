@@ -1,15 +1,12 @@
 # Table of Contents
 
 - [Table of Contents](#table-of-contents)
-  - [Asteroid Data Pipeline: Efficient NASA Data Processing and Storage](#asteroid-data-pipeline-efficient-nasa-data-processing-and-storage)
   - [Motivation and Objectives](#motivation-and-objectives)
   - [Overview](#overview)
   - [Architecture](#architecture)
   - [New Personal Insights](#new-personal-insights)
   - [Prerequisites](#prerequisites)
   - [System Configuration](#system-configuration)
-
-## Asteroid Data Pipeline: Efficient NASA Data Processing and Storage
 
 
 ## Motivation and Objectives
