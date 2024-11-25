@@ -16,7 +16,7 @@ from utils.constants import (nasa_api_key,
 from pipelines.extract import (generate_time_range,
                                test_api_call,
                                extract_close_approach_column,
-                               extract_neo_data_raw) 
+                               extract_neo_data_raw)
 
 
 API_KEY = nasa_api_key
@@ -38,7 +38,7 @@ dag = DAG(
     schedule_interval='@weekly',
     catchup=False,
     max_active_runs=1,
-    tags=['NASA', 'Near_Earth_Objects']
+    tags=['Batch','NASA', 'Near_Earth_Objects']
 )
 
 """

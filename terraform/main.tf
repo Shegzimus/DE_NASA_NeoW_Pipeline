@@ -144,11 +144,6 @@ resource "google_bigquery_dataset" "warehouse_layer" {
 
 
 
-
-
-
-
-
 # Set up a Pubsub Topic
 resource "google_pubsub_topic" "scheduler_topic" {
   name = "weekly-task-trigger"
@@ -181,5 +176,22 @@ resource "google_pubsub_subscription" "function_subscription" {
   }
 }
 
+resource "google_cloudfunctions_function" "my_function" {
+  name        = "my-cloud-function"
+  runtime     = "python310"  # Can be any supported runtime like nodejs, python, etc.
+  entry_point = "main"  # Entry point function in your code
+  region      = "us-central1"
+  project     = "your-project-id"
+
+  source_archive_bucket = "your-bucket-name"
+  source_archive_object = "function-source.zip"
+
+  trigger_http = true
+
+  # Optional: Allow unauthenticated access
+  https_trigger {
+    insecure = false
+  }
+}
 
 
