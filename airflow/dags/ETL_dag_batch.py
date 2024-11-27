@@ -15,8 +15,18 @@ from utils.constants import (nasa_api_key,
 
 from pipelines.extract import (generate_time_range,
                                test_api_call,
-                               extract_close_approach_column,
-                               extract_neo_data_raw)
+                               extract_batch_close_approach,
+                               extract_batch_neo_data_raw)
+
+
+from pipelines.transform import (
+
+)
+
+from pipelines.load import (
+
+)
+
 
 
 API_KEY = nasa_api_key
@@ -33,7 +43,7 @@ default_args = {
 }
 
 dag = DAG(
-    dag_id='Batch_Extract',
+    dag_id='Batch_ETL',
     default_args=default_args,
     schedule_interval='@weekly',
     catchup=False,
@@ -45,12 +55,6 @@ dag = DAG(
 Task 1: Test the API
 
 """
-
-# test_api_task = PythonOperator(
-#     task_id='test_api',
-#     python_callable=lambda: os.system(f'curl -X GET f"https://api.nasa.gov/neo/rest/v1/feed?start_date={test_start}&end_date={test_end}&api_key={nasa_api_key}"'),
-#     dag=dag
-# )
 
 test_api_task = PythonOperator(
     task_id='test_api',
@@ -71,7 +75,7 @@ Task 2: Extract the close approach data
 """
 extract_close_approach_task = PythonOperator(
     task_id='extract_close_approach',
-    python_callable=extract_close_approach_column(today_date),
+    python_callable=extract_batch_close_approach(today_date),
     dag=dag
 )
 
@@ -83,6 +87,6 @@ Task 3: Extract the Neo data raw
 
 extract_neo_data_raw_task = PythonOperator(
     task_id='extract_neo_data_raw',
-    python_callable=extract_neo_data_raw(today_date),
+    python_callable=extract_batch_neo_data_raw(today_date),
     dag=dag   
     )
