@@ -103,7 +103,7 @@ def extract_dataframe_from_response(data: json) -> pd.json_normalize:
     return df
 
 
-def extract_close_approach_column(execution_date: datetime) -> None:
+def extract_batch_close_approach(execution_date: datetime) -> None:
     """
     Extracts and processes close approach data from the NASA NEO (Near-Earth Objects) API response.
     Generates a date range based on the given execution date, sends a request to the API, processes the response,
@@ -161,8 +161,8 @@ def extract_close_approach_column(execution_date: datetime) -> None:
 
     # Save the processed data in CSV & Parquet formats
     try:
-        save_df_to_csv(df_extracted, file_postfix, 'opt/airflow/data/input/batch/close_approach/csv/')
-        save_df_to_parquet(df_extracted, file_postfix, 'opt/airflow/data/input/batch/close_approach/parquet/')
+        save_df_to_csv(close_approach_df, file_postfix, 'opt/airflow/data/input/batch/close_approach/csv/')
+        save_df_to_parquet(close_approach_df, file_postfix, 'opt/airflow/data/input/batch/close_approach/parquet/')
     except Exception as e:
         print(f"Error saving expanded data to Parquet: {e}")
 
