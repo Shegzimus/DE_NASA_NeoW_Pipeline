@@ -20,7 +20,8 @@ from pipelines.extract import (test_api_call,
                                extract_and_save_ast_data)
 
 from pipelines.transform import (process_hist_neo_feed_in_folder,
-                                 process_hist_approach_in_folder)
+                                 process_hist_approach_in_folder,
+                                 transform_hist_asteroid_raw)
 
 
 
@@ -52,7 +53,7 @@ dag = DAG(
 )
 
 """
-Task 1: Test the API
+Task 1.0: Test the API
 
 """
 
@@ -70,7 +71,7 @@ test_api_task = PythonOperator(
 
 """
 
-Task 2: Extract historical close approach data
+Task 1.1: Extract historical close approach data
 
 """
 extract_hist_close_approach_task = PythonOperator(
@@ -81,7 +82,7 @@ extract_hist_close_approach_task = PythonOperator(
 
 """
 
-Task 3: Extract historical Neo data raw
+Task 1.2: Extract historical Neo data raw
 
 """
 
@@ -94,7 +95,7 @@ extract_hist_neo_data_task = PythonOperator(
 
 
 """
-Task 4: Extract and save all Asteroid data
+Task 1.3: Extract and save all Asteroid data
 
 """
 extract_and_save_ast_data_task= PythonOperator(
@@ -102,6 +103,42 @@ extract_and_save_ast_data_task= PythonOperator(
     python_callable=extract_and_save_ast_data,
     dag=dag      
 )
+
+
+"""
+Task 2.0: Transform the neo feed data
+
+"""
+
+process_hist_neo_feed_in_folder_task = PythonOperator(
+    task_id='process_hist_neo_feed_in_folder',
+    python_callable=process_hist_neo_feed_in_folder,
+    dag=dag
+)
+
+"""
+Task 2.1: Transform the close approach data
+
+"""
+
+process_hist_approach_in_folder_task = PythonOperator(
+    task_id='process_hist_approach_in_folder',
+    python_callable=process_hist_approach_in_folder,
+    dag=dag
+)
+
+
+"""
+Task 2.2: Transform the historical asteroid data
+
+"""
+
+transform_hist_asteroid_raw_task = PythonOperator(
+    task_id='transform_hist_asteroid_raw',
+    python_callable=transform_hist_asteroid_raw,
+    dag=dag
+)
+
 
 
 
