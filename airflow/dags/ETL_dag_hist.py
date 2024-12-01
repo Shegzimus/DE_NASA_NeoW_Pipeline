@@ -44,13 +44,16 @@ default_args = {
 }
 
 dag = DAG(
-    dag_id='Historic_Extract',
+    dag_id='Historic_ETL',
     default_args=default_args,
-    schedule_interval='@weekly',
+    schedule_interval=None,
     catchup=False,
     max_active_runs=1,
     tags=['Historic','NASA', 'Near_Earth_Objects']
 )
+
+
+############################################################################################
 
 """
 Task 1.0: Test the API
@@ -70,7 +73,6 @@ test_api_task = PythonOperator(
 
 
 """
-
 Task 1.1: Extract historical close approach data
 
 """
@@ -81,7 +83,6 @@ extract_hist_close_approach_task = PythonOperator(
 )
 
 """
-
 Task 1.2: Extract historical Neo data raw
 
 """
@@ -104,6 +105,8 @@ extract_and_save_ast_data_task= PythonOperator(
     dag=dag      
 )
 
+
+############################################################################################
 
 """
 Task 2.0: Transform the neo feed data
@@ -140,7 +143,12 @@ transform_hist_asteroid_raw_task = PythonOperator(
 )
 
 
+############################################################################################
 
+"""
+Task 3.0: Load the transformed data
+
+"""
 
 
 Begin = DummyOperator(task_id="begin", dag=dag)
@@ -160,4 +168,10 @@ Begin >> test_api_task
 
 test_api_task >> extract_hist_close_approach_task
 
-extract_hist_close_approach_task >> extract_hist_neo_data_task >> Extraction_Complete
+extract_hist_close_approach_task >> extract_hist_neo_data_task >> extract_and_save_ast_data_task >> Extraction_Complete
+
+
+Extraction_Complete >> process_hist_neo_feed_in_folder_task >> process_hist_approach_in_folder_task >> transform_hist_asteroid_raw_task >> Transformation_Complete
+
+
+Transformation_Complete >>                   >> Load_Complete
