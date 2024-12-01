@@ -104,6 +104,34 @@ def drop_duplicates(df: pd.DataFrame, subset: list = None, keep: str = "first") 
     return df.drop_duplicates(subset=subset, keep=keep).reset_index(drop=True)
 
 
+def drop_non_integer_rows(df: pd.DataFrame, column: str) -> pd.DataFrame:
+    """
+    Drops rows where the specified column cannot be converted to integers.
+
+    Parameters:
+        df (pd.DataFrame): The DataFrame to modify.
+        column (str): The column to check for integer conversion.
+
+    Returns:
+        pd.DataFrame: The modified DataFrame with non-integer rows removed.
+    """
+    def is_integer(value):
+        try:
+            int(value)
+            return True
+        except ValueError:
+            return False
+
+    # Filter the DataFrame to keep only rows where the column contains valid integers
+    filtered_df = df[df[column].apply(is_integer)].copy()
+
+    # Optionally, convert the column to integers after filtering
+    df[column] = filtered_df[column].astype(int)
+
+    return df
+
+
+
 # Save transformed file to parquet
 def save_to_parquet_trf(df: pd.DataFrame, filename: str, save_path: str) -> None: 
     """
@@ -204,17 +232,41 @@ ASTEROID DATA HISTORICAL TRANSFORM
 
 """
 
-def transform_hist_asteroid_raw(filepath: str):
+def transform_hist_asteroid_raw():
     """
     Use the helper functions to transform a single file and save as parquet
     """
-
+    filepath = 'airflow/data/input/historical/asteroid_data/csv/neo_browse_asteroid_data.csv'
+    
     df, filename = parse_csv(filepath)
 
-    df = cols_to_datetime(df, 'close_approach_date', 'close_approach_date_full')
-    df = drop_columns(df, 'orbiting_body')
-    df = drop_duplicates(df, subset=['id', 'close_approach_date', 'close_approach_date_full'])
+    df = cols_to_datetime(df, 
+                          'orbital_data.orbit_determination_date', 
+                          'orbital_data.first_observation_date',
+                          'orbital_data.last_observation_date',
+                          )
+    
+    df = drop_columns(df,
+                      'designation', 
+                      'close_approach_data',
+                      'links.self',
+                      'sentry_data',
+                      'neo_reference_id')
+    
+    df = cols_to_string(df, 
+                        'name', 
+                        'name_limited', 
+                        'nasa_jpl_url', 
+                        'orbital_data.equinox',
+                        'orbital_data.orbit_class.orbit_class_type',
+                        'orbital_data.orbit_class.orbit_class_range',
+                        'orbital_data.orbit_class.orbit_class_description',
+                        'orbital_data.orbit_id'
+                        )
+    
+    drop_non_integer_rows(df, 'id')
+
     print(df.info())
 
-    save_path = 'opt/airflow/data/output/historical/close_approach'
+    save_path = 'opt/airflow/data/output/historical/asteroid_data/'
     save_to_parquet_trf(df, filename, save_path)
