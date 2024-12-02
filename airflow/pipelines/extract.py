@@ -272,7 +272,7 @@ def extract_and_save_ast_data() -> None:
     # Convert to DataFrame
     df = pd.json_normalize(all_asteroid_data)
 
-    # Save to CSV
+    # Save to CSV & Parquet
     
     save_df_to_csv(df, file_postfix='neo_browse_asteroid_data', path= 'airflow/data/input/historical/asteroid_data/csv/')
     save_df_to_parquet(df, file_postfix='neo_browse_asteroid_data', path= 'airflow/data/input/historical/asteroid_data/parquet/')
