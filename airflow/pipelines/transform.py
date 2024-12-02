@@ -10,7 +10,7 @@ from typing import List, Tuple
 
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
+from pipelines.extract import generate_time_range
 
 
 """
@@ -269,4 +269,51 @@ def transform_hist_asteroid_raw():
     print(df.info())
 
     save_path = 'opt/airflow/data/output/historical/asteroid_data/'
+    save_to_parquet_trf(df, filename, save_path)
+
+
+##################################################################################################
+
+
+"""
+BATCH CLOSE APPROACH
+
+"""
+def transform_batch_close_approach(execution_date):
+    
+
+    start_date, end_date, file_postfix = generate_time_range(execution_date)
+    filepath = f'airflow/data/input/batch/close_approach/csv/{file_postfix}.csv'
+    df, filename= parse_csv(filepath)
+
+    df = cols_to_datetime(df, 'close_approach_date', 'close_approach_date_full')
+    df = drop_columns(df, 'orbiting_body')
+    df = drop_duplicates(df, subset=['id', 'close_approach_date', 'close_approach_date_full'])
+    print(df.info())
+
+    save_path = 'opt/airflow/data/output/batch/close_approach'
+    save_to_parquet_trf(df, filename, save_path)
+
+
+"""
+BATCH NEO FEED
+
+"""
+def transform_neo_feed_batch(execution_date):
+    """
+    Use the helper functions to transform a single file and save as parquet
+    """
+    start_date, end_date, file_postfix = generate_time_range(execution_date)
+    filepath = f'opt/airflow/data/input/batch/neo_feed/csv/{file_postfix}.csv'
+    df, filename= parse_csv(filepath)
+
+    df = drop_columns(df, 'links.self', 'sentry_data', 'close_approach_data')
+    df = cols_to_datetime(df, 'close_approach_date')
+    df = cols_to_string(df, 'name', 'nasa_jpl_url')
+    df = drop_duplicates(df, subset=['id', 'name'])
+
+    save_path = 'opt/airflow/data/output/batch/neo_feed/'
+
+    print(f"\nProcessing file: {filename}\n{'-' *100}")
+    print(df.info())
     save_to_parquet_trf(df, filename, save_path)
