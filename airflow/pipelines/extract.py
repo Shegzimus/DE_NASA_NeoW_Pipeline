@@ -59,7 +59,7 @@ def test_api_call():
         print(f"Response: {response.text}")
 
 
-def test_api_neo_feed(START_DATE: datetime, END_DATE: datetime, API_KEY: str) -> json:
+def request_api_neo_feed(START_DATE: datetime, END_DATE: datetime, API_KEY: str) -> json:
     """
     This function sends a request to the NASA NEO (Near-Earth Objects) API to fetch data for a given date range.
 
@@ -124,7 +124,7 @@ def extract_batch_close_approach(execution_date: datetime) -> None:
 
     # Fetch data from the API
     try:
-        data = test_api_neo_feed(start_date, end_date, API_KEY=nasa_api_key)
+        data = request_api_neo_feed(start_date, end_date, API_KEY=nasa_api_key)
         if not data:
             print(f"No data received for the date range: {start_date} to {end_date}")
             return
@@ -187,7 +187,7 @@ def extract_batch_neo_data_raw(execution_date: datetime) -> None:
 
     try:
         # Fetch data from NASA NEO API
-        data = test_api_neo_feed(start_date, end_date, API_KEY=nasa_api_key)
+        data = request_api_neo_feed(start_date, end_date, API_KEY=nasa_api_key)
         if not data:
             print("No data received from the API for the specified date range.")
             return
@@ -344,7 +344,7 @@ def extract_hist_neo_data_raw(execution_date: datetime)-> None:
 
     for start_date, end_date, file_postfix in date_ranges:
         try:
-            data = test_api_neo_feed(start_date, end_date, API_KEY=nasa_api_key)
+            data = request_api_neo_feed(start_date, end_date, API_KEY=nasa_api_key)
         
             df_extracted = extract_dataframe_from_response(data)
 
@@ -365,7 +365,7 @@ def extract_hist_close_approach(execution_date: datetime)-> None:
     for start_date, end_date, file_postfix in date_ranges:
         try:
             # Fetch data from NASA NEO API
-            data = test_api_neo_feed(start_date, end_date, API_KEY=nasa_api_key)
+            data = request_api_neo_feed(start_date, end_date, API_KEY=nasa_api_key)
 
             # Process the API response into a DataFrame
             df_extracted = extract_dataframe_from_response(data)
