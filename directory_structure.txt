@@ -1,0 +1,10 @@
+project-root/
+│
+├── airflow/             # Airflow DAGs, plugins, etc.
+├── terraform/           # Infrastructure as code for GCS, BigQuery, etc.
+├── dbt/                 # DBT models and configuration
+│   ├── models/          # SQL models for transformations
+│   ├── tests/           # Tests for data validation
+│   ├── snapshots/       # For historical snapshot management (if needed)
+│   ├── dbt_project.yml  # DBT project configuration
+│   └── profiles.yml     # DBT connection and credential configurations
