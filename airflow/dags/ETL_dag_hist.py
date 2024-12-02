@@ -9,9 +9,7 @@ from airflow.operators.dummy import DummyOperator
 # Add the parent directory to the system path for importing the contants file
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from utils.constants import (nasa_api_key, 
-                             OUTPUT_PATH, 
-                             INPUT_PATH)
+from utils.constants import nasa_api_key
 
 from pipelines.extract import (test_api_call,
                                generate_time_range,
