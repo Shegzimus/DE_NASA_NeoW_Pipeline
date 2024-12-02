@@ -383,7 +383,7 @@ def extract_hist_close_approach(execution_date: datetime)-> None:
             close_approach_df = pd.DataFrame(close_approach_expanded)
 
             # Save the extracted data to CSV and PQ 
-            save_df_to_csv(close_approach_df, file_postfix, 'airflow\data\input\historical\close_approach\csv')
-            save_df_to_parquet(close_approach_df, file_postfix, 'airflow\data\input\historical\close_approach\parquet')
+            save_df_to_csv(close_approach_df, file_postfix, 'opt/airflow/data/input/historical/close_approach/csv')
+            save_df_to_parquet(close_approach_df, file_postfix, 'opt/airflow/data/input/historical/close_approach\parquet')
         except Exception as e:
             print(f"Error processing close approach data for range {start_date} to {end_date}: {e}")
