@@ -9,24 +9,21 @@ from airflow.operators.dummy import DummyOperator
 # Add the parent directory to the system path for importing the contants file
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from utils.constants import (nasa_api_key, 
-                             OUTPUT_PATH, 
-                             INPUT_PATH)
+from utils.constants import nasa_api_key
 
 from pipelines.extract import (generate_time_range,
                                test_api_call,
                                extract_batch_close_approach,
-                               extract_batch_neo_data_raw)
-
+                               extract_batch_neo_data_raw
+                               )
 
 from pipelines.transform import (transform_batch_close_approach,
                                  transform_neo_feed_batch
+                                 )
 
-)
-
-from pipelines.load import (
-
-)
+from pipelines.load import (load_batch_close_approach_data,
+                            load_batch_neo_feed_data
+                            )
 
 
 
@@ -86,7 +83,7 @@ Task 3: Extract the Neo data raw
 
 """
 
-extract_batch_neo_data_task = PythonOperator(
+extract_batch_neo_feed_task = PythonOperator(
     task_id='extract_neo_data_raw',
     python_callable=extract_batch_neo_data_raw(today_date),
     dag=dag   
@@ -110,15 +107,41 @@ transform_close_approach_task = PythonOperator(
 Task 5: Transform the Neo data feed
 
 """
-transform_neo_feed_task = PythonOperator(
+transform_batch_neo_feed_task = PythonOperator(
     task_id='transform_neo_feed',
     python_callable=transform_neo_feed_batch(today_date),
     dag=dag
+)
+
+
+"""
+Task 6: Upload the Close approach data
+
+"""
+
+upload_batch_close_approach_task = PythonOperator(
+    task_id='upload_batch_close_approach',
+    python_callable=load_batch_close_approach_data,
+    dag=dag
+)
+
+"""
+Task 7: Upload the Neo feed data
+
+"""
+upload_batch_neo_feed_task = PythonOperator(
+    task_id='upload_batch_neo_feed',
+    python_callable=load_batch_neo_feed_data,
+    dag=dag  # Use the same DAG as the previous tasks to ensure data dependencies are correctly set up.  # noqa: E501
 )
 
 Begin = DummyOperator(task_id="Begin", dag=dag)
 End = DummyOperator(task_id="End", dag=dag)
 
 
-Begin >> test_api_task  >> [extract_close_approach_task, extract_batch_neo_data_task]
+Begin >> test_api_task  >> [extract_batch_close_approach_task, extract_batch_neo_feed_task]
 
+extract_batch_close_approach_task >> transform_close_approach_task >> upload_batch_close_approach_task
+extract_batch_neo_feed_task >> transform_batch_neo_feed_task >> upload_batch_neo_feed_task
+
+[upload_batch_close_approach_task, upload_batch_neo_feed_task] >> End
