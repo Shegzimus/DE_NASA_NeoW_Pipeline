@@ -226,7 +226,7 @@ HISTORICAL EXTRACTORS
 
 
 # =========================================  ASTEROID DATA ========================================================
-def fetch_all_ast_pages_with_progress() -> list:
+def fetch_all_ast_pages() -> list:
     """
     Fetches all paginated data from the NASA NEO (Near-Earth Objects) API.
     It uses a progress bar to track the fetching process.
@@ -267,7 +267,7 @@ def fetch_all_ast_pages_with_progress() -> list:
 
 def extract_and_save_ast_data() -> None:
     # Fetch all paginated data
-    all_asteroid_data = fetch_all_ast_pages_with_progress()
+    all_asteroid_data = fetch_all_ast_pages()
 
     # Convert to DataFrame
     df = pd.json_normalize(all_asteroid_data)
@@ -344,13 +344,10 @@ def extract_hist_neo_data_raw(execution_date: datetime)-> None:
 
     for start_date, end_date, file_postfix in date_ranges:
         try:
-            # Fetch data from NASA NEO API
             data = test_api_neo_feed(start_date, end_date, API_KEY=nasa_api_key)
-
-            # Process the API response into a DataFrame
+        
             df_extracted = extract_dataframe_from_response(data)
 
-            # Save the extracted data to a CSV and PQ files
             save_df_to_csv(df_extracted, file_postfix, 'opt/airflow/data/input/historical/neo_feed/csv')
             save_df_to_parquet(df_extracted, file_postfix,'opt/airflow/data/input/historical/neo_feed/parquet' )
         except Exception as e:
