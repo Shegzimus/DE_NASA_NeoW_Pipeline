@@ -1,7 +1,7 @@
 import pytest
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 import sys
 import os
 import pandas as pd
@@ -10,7 +10,14 @@ import pandas as pd
 # Add the parent directory to the system path to import functions for testing purposes
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from pipelines.extract import generate_time_range, test_api_call, extract_dataframe_from_response
+from pipelines.extract import (generate_time_range, 
+                                test_api_call, 
+                                extract_dataframe_from_response,  extract_batch_close_approach,
+                                request_api_neo_feed,
+                                extract_dataframe_from_response,
+                                save_df_to_csv,
+                                save_df_to_parquet,
+                                generate_hist_ranges)
 from utils.constants import nasa_api_key
 
 def test_generate_time_range():
@@ -133,3 +140,170 @@ def test_extract_dataframe_from_response():
     assert not asteroid_1.empty, "Asteroid 1 is missing in the DataFrame"
     assert asteroid_1["name"].iloc[0] == "Asteroid 1", "Asteroid 1's name is incorrect"
     assert asteroid_1["is_potentially_hazardous_asteroid"].iloc[0] is True, "Asteroid 1 hazard status is incorrect"
+
+
+
+
+@pytest.fixture
+def mock_execution_date():
+    return datetime(2024, 12, 2)
+
+@pytest.fixture
+def mock_api_data():
+    return {
+        "near_earth_objects": {
+            "2024-11-25": [
+                {
+                    "id": "12345",
+                    "close_approach_data": [
+                        {
+                            "relative_velocity": {"kilometers_per_hour": "12345"},
+                            "miss_distance": {"kilometers": "54321"},
+                        }
+                    ],
+                }
+            ]
+        }
+    }
+
+@pytest.fixture
+def mock_extracted_dataframe():
+    return pd.DataFrame([
+        {
+            "id": "12345",
+            "close_approach_data": [
+                {
+                    "relative_velocity": {"kilometers_per_hour": "12345"},
+                    "miss_distance": {"kilometers": "54321"},
+                }
+            ],
+        }
+    ])
+
+def test_successful_execution(mock_execution_date, mock_api_data, mock_extracted_dataframe):
+    with patch("pipelines.extract.generate_time_range") as mock_generate_time_range, \
+         patch("pipelines.extract.request_api_neo_feed") as mock_request_api, \
+         patch("pipelines.extract.extract_dataframe_from_response") as mock_extract_df, \
+         patch("pipelines.extract.save_df_to_csv") as mock_save_csv, \
+         patch("pipelines.extract.save_df_to_parquet") as mock_save_parquet:
+         
+        # Mock return values
+        mock_generate_time_range.return_value = ("2024-11-24", "2024-11-30", "20241124_20241130")
+        mock_request_api.return_value = mock_api_data
+        mock_extract_df.return_value = mock_extracted_dataframe
+
+        # Call the function
+        extract_batch_close_approach(mock_execution_date)
+
+        # Assertions
+        mock_generate_time_range.assert_called_once_with(mock_execution_date)
+        mock_request_api.assert_called_once_with("2024-11-24", "2024-11-30", API_KEY={nasa_api_key})
+        mock_extract_df.assert_called_once_with(mock_api_data)
+        mock_save_csv.assert_called()
+        mock_save_parquet.assert_called()
+
+def test_api_failure(mock_execution_date):
+    with patch("pipelines.extract.request_api_neo_feed", side_effect=Exception("API Error")) as mock_request_api:
+        extract_batch_close_approach(mock_execution_date)
+        mock_request_api.assert_called_once()
+
+def test_empty_api_response(mock_execution_date):
+    with patch("pipelines.extract.request_api_neo_feed", return_value=None) as mock_request_api:
+        extract_batch_close_approach(mock_execution_date)
+        mock_request_api.assert_called_once()
+
+def test_invalid_data_structure(mock_execution_date, mock_api_data):
+    invalid_data = {"invalid_key": "unexpected value"}
+    with patch("pipelines.extract.request_api_neo_feed", return_value=invalid_data), \
+         patch("pipelines.extract.extract_dataframe_from_response", side_effect=KeyError("close_approach_data")):
+        extract_batch_close_approach(mock_execution_date)
+
+def test_save_error_handling(mock_execution_date, mock_api_data, mock_extracted_dataframe):
+    with patch("pipelines.extract.request_api_neo_feed", return_value=mock_api_data), \
+         patch("pipelines.extract.extract_dataframe_from_response", return_value=mock_extracted_dataframe), \
+         patch("pipelines.extract.save_df_to_parquet", side_effect=Exception("Save Error")) as mock_save_parquet:
+        extract_batch_close_approach(mock_execution_date)
+        mock_save_parquet.assert_called()
+
+
+def test_save_df_to_parquet():
+    # Mock DataFrame to test with
+    test_df = pd.DataFrame({
+        "col1": [1, 2, 3],
+        "col2": ["a", "b", "c"]
+    })
+    file_postfix = "test_postfix"
+    path = "/mock/path"
+
+    # Mock the DataFrame's to_parquet method
+    with patch("pandas.DataFrame.to_parquet") as mock_to_parquet:
+        save_df_to_parquet(test_df, file_postfix, path)
+
+        # Build the expected filepath
+        expected_filepath = f"{path}/{file_postfix}.parquet"
+
+        # Verify to_parquet was called with the correct arguments
+        mock_to_parquet.assert_called_once_with(expected_filepath, index=False)
+
+
+def test_save_df_to_csv():
+    # Mock DataFrame to test with
+    test_df = pd.DataFrame({
+        "col1": [1, 2, 3],
+        "col2": ["a", "b", "c"]
+    })
+    file_postfix = "test_postfix"
+    path = "/mock/path"
+
+    # Mock the DataFrame's to_csv method
+    with patch("pandas.DataFrame.to_csv") as mock_to_csv:
+        save_df_to_csv(test_df, file_postfix, path)
+
+        # Build the expected filepath
+        expected_filepath = f"{path}/{file_postfix}.csv"
+
+        # Verify to_csv was called with the correct arguments
+        mock_to_csv.assert_called_once_with(expected_filepath, index=False)
+
+
+
+@pytest.mark.parametrize(
+    "start_datetime, mock_current_date, expected",
+    [
+        # Case 1: Standard multiple weeks
+        (
+            "20241117", 
+            datetime(2024, 1, 22),
+            [
+                ("2024-11-17", "2024-11-23", "20241117_20241123"),
+                ("2024-11-24", "2024-11-30", "20241124_20241130")
+            ],
+        ),
+        # Case 2: Single week with partial days
+        (
+            "20241201", 
+            datetime(2024, 12, 2),
+            [],
+        ),
+        # Case 3: Start date in the future
+        (
+            "20241210",
+            datetime(2024, 12, 2),  # Current date is before start date
+            [],
+        ),
+    ]
+)
+def test_generate_hist_ranges(monkeypatch, start_datetime, mock_current_date, expected):
+    """
+    Test the generate_hist_ranges function with various inputs.
+    """
+    # Mock datetime.now() to control the "current date" behavior
+    class MockDateTime(datetime):
+        @classmethod
+        def now(cls):
+            return mock_current_date
+
+    monkeypatch.setattr("datetime.datetime", MockDateTime)
+
+    result = generate_hist_ranges(start_datetime)
+    assert result == expected, f"Expected {expected} but got {result}"
