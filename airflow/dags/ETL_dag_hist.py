@@ -23,9 +23,7 @@ from pipelines.transform import (process_hist_neo_feed_in_folder,
 
 
 
-from pipelines.load import (load_historical_close_approach_data,
-                            load_historical_neo_feed_data,
-                            load_asteroid_data)
+from pipelines.load import upload_folder_to_gcs, extract_schema_from_parquet
 
 
 
@@ -33,7 +31,13 @@ API_KEY = nasa_api_key
 today_date = datetime.now().strftime("%Y-%m-%d")
 start_date, end_date, postfix = generate_time_range(today_date)
 
+# Retrieve variables from Airflow environment
+PROJECT_ID = os.environ.get("GCP_PROJECT_ID")
+BUCKET = os.environ.get("GCP_GCS_BUCKET")
+STAGING = os.environ.get("BQ_DATASET_STAGING")
+WAREHOUSE = os.environ.get("BQ_DATASET_WAREHOUSE")
 
+# Define the DAG and default args
 default_args = {
     'owner': 'Oluwasegun',
     'depends_on_past': False,
@@ -144,14 +148,37 @@ transform_hist_asteroid_raw_task = PythonOperator(
 ############################################################################################
 
 """
-Task 3.0: Load the transformed data
+Task 3.0: Define the folder paths and their GCS target prefix
 
 """
 
+bucket_name = BUCKET
+folder_paths = [
+    {"local_folder": "opt/airflow/data/output/historical/asteroid_data", "gcs_prefix": "raw/historical/asteroid_data"},
+    {"local_folder": "opt/airflow/data/output/historical/close_approach", "gcs_prefix": "raw/historical/close_approach"},
+    {"local_folder": "opt/airflow/data/output/historical/neo_feed", "gcs_prefix": "raw/historical/neo_feed"}
+]
 
 
 
+"""
+Task 3.1: Upload the specified folders to the GCS Bucket
 
+"""
+upload_to_gcs_tasks = []
+for folder in folder_paths:
+    task = PythonOperator(
+        task_id=f"upload_{os.path.basename(folder['local_folder'])}_to_gcs",
+        python_callable=upload_folder_to_gcs,
+        op_kwargs={
+            "bucket_name": bucket_name,
+            "local_folder": folder["local_folder"],
+            "target_folder_prefix": folder["gcs_prefix"]
+        },
+        provide_context=True,
+        dag=dag
+    )
+    upload_to_gcs_tasks.append(task)
 
 
 
@@ -183,4 +210,4 @@ extract_hist_close_approach_task >> extract_hist_neo_data_task >> extract_and_sa
 Extraction_Complete >> process_hist_neo_feed_in_folder_task >> process_hist_approach_in_folder_task >> transform_hist_asteroid_raw_task >> Transformation_Complete
 
 
-Transformation_Complete >>                  Load_Complete
+Transformation_Complete >>  upload_to_gcs_tasks >> Load_Complete >> End
