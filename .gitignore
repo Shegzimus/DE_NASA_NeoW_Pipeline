@@ -1,31 +1,26 @@
 venv/
-airflow/.google
 
+airflow/.google
 airflow/utils/__pycache__
 airflow/pipelines/__pycache__
 airflow/dags/__pycache__
 airflow/config/secrets.conf
+airflow/pipelines/lab.py
+airflow/pipelines/2nd_lab.py
+airflow/data/input
+airflow/data/output
+airflow/tests/__pycache__/
 
+
+firebase-debug.log
 
 
 
 terraform/.terraform
 terraform/nasa-neows-c12d19292fad.json
-
-
-airflow/pipelines/lab.py
-airflow/pipelines/2nd_lab.py
-
-airflow/data/input
-airflow/data/output
-firebase-debug.log
-airflow/tests/__pycache__/extract_tests.cpython-311-pytest-8.3.3.pyc
 terraform/.terraform.lock.hcl
-airflow/tests/__pycache__/extract_tests.cpython-311-pytest-8.3.3.pyc
 terraform/terraform.tfstate
-terraform/tests/__pycache__/fixtures.cpython-311.pyc
-terraform/tests/__pycache__/test_terraform.cpython-311-pytest-8.3.3.pyc
+terraform/tests/__pycache__
 terraform/tests/test_terraform.py
 terraform/tests/fixtures.py
-airflow/tests/__pycache__/extract_tests.cpython-311-pytest-8.3.3.pyc
-airflow/tests/__pycache__/extract_tests.cpython-311-pytest-8.3.3.pyc
+
