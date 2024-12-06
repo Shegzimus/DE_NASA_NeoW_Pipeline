@@ -300,9 +300,11 @@ def generate_hist_ranges(start_datetime: str) -> List[Tuple[str, str, str]]:
     while start_date <= current_date:
         # Calculate the end of the current week
         end_date = start_date + timedelta(days=6)
+
+        # Skip if the end date is after the current date due to API limitations
         if end_date > current_date:
-            end_date = current_date  # Clip to the current date if in the last week
-        
+            break
+
         # Convert dates to strings
         start_date_str = start_date.strftime("%Y-%m-%d")
         end_date_str = end_date.strftime("%Y-%m-%d")
@@ -384,6 +386,6 @@ def extract_hist_close_approach(execution_date: datetime)-> None:
 
             # Save the extracted data to CSV and PQ 
             save_df_to_csv(close_approach_df, file_postfix, 'opt/airflow/data/input/historical/close_approach/csv')
-            save_df_to_parquet(close_approach_df, file_postfix, 'opt/airflow/data/input/historical/close_approach\parquet')
+            save_df_to_parquet(close_approach_df, file_postfix, 'opt/airflow/data/input/historical/close_approach/parquet')
         except Exception as e:
             print(f"Error processing close approach data for range {start_date} to {end_date}: {e}")
