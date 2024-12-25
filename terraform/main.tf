@@ -115,6 +115,24 @@ resource "google_storage_bucket" "data-lake-bucket" {
   force_destroy = true
 }
 
+# Folders in the bucket for historic and batch data
+resource "google_storage_bucket_object" "folder" {
+  for_each = toset([
+    "historical/",
+    "historical/asteroid_data/",
+    "historical/close_approach/",
+    "historical/neo_feed/",
+    "batch/",
+    "batch/close_approach/",
+    "batch/neo_feed/"
+  ])
+  name   = each.value
+  bucket = google_storage_bucket.data-lake-bucket.name
+  content = " "  # Create an empty object with a single space or dummy content to represent a folder
+}
+
+
+
 # Provision BigQuery Datasets
 # Ref: https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/bigquery_dataset
 resource "google_bigquery_dataset" "staging_layer" {
