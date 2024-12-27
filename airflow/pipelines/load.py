@@ -58,7 +58,7 @@ def generate_gcs_target_path(local_file_path: str, local_folder: str, target_fol
     return os.path.join(target_folder_prefix, relative_path).replace("\\", "/")
 
 
-def upload_file_to_gcs(bucket, local_file_path: str, target_file_path: str):
+def upload_file_to_gcs(bucket, local_file_path: str, target_file_path: str)-> None:
     """
     This function takes a Google Cloud Storage (GCS) bucket object, a local file path, and a target file path.
     It creates a blob object in the specified bucket using the target file path, then uploads the local file
@@ -73,7 +73,7 @@ def upload_file_to_gcs(bucket, local_file_path: str, target_file_path: str):
     blob.upload_from_filename(local_file_path)
 
 
-def upload_folder_to_gcs(bucket_name: str, local_folder: str, target_folder_prefix="") -> list:
+def upload_folder_to_gcs(bucket_name: str, local_folder: str, target_folder_prefix="") -> None:
     """
     Uploads all files in a local folder to a specified Google Cloud Storage (GCS) bucket, preserving
     the folder structure in GCS. Returns the list of GCS paths for any .parquet files uploaded.
@@ -83,13 +83,9 @@ def upload_folder_to_gcs(bucket_name: str, local_folder: str, target_folder_pref
     local_folder (str): The path of the local folder to upload.
     target_folder_prefix (str, optional): The prefix path in GCS where the files will be stored.
                                          Defaults to an empty string.
-
-    Returns:
-    list: List of GCS paths where .parquet files were uploaded.
     """
     configure_gcs_upload_settings()
     bucket = initialize_gcs_bucket(bucket_name)
-    parquet_gcs_paths = []
 
     for root, _, files in os.walk(local_folder):
         for file in files:
@@ -97,42 +93,7 @@ def upload_folder_to_gcs(bucket_name: str, local_folder: str, target_folder_pref
             target_file_path = generate_gcs_target_path(local_file_path, local_folder, target_folder_prefix)
             upload_file_to_gcs(bucket, local_file_path, target_file_path)
 
-    return parquet_gcs_paths
-
-
-def extract_schema_from_parquet(file_path: str) -> list[bigquery.SchemaField]: 
-    # Create a GCS filesystem object
-    fs = gcsfs.GCSFileSystem()
-
-    # Open the file using GCSFS
-    with fs.open(file_path, 'rb') as f:
-        parquet_file = pq.ParquetFile(f)
-        schema = parquet_file.schema_arrow
-
-    # Convert PyArrow schema to BigQuery schema fields
-    bq_schema = []
-    for field in schema:
-        field_type = field.type
-        # Map PyArrow types to BigQuery types
-        if field_type == "int64":
-            bq_type = "INTEGER"
-        elif field_type == "float64":
-            bq_type = "FLOAT"
-        elif field_type == "string":
-            bq_type = "STRING"
-        elif field_type == "bool":
-            bq_type = "BOOLEAN"
-        elif field_type == "timestamp":
-            bq_type = "TIMESTAMP"
-        else:
-            bq_type = "STRING"  # Default to STRING for any unrecognized type
-
-        bq_schema.append(bigquery.SchemaField(name=field.name, field_type=bq_type))
-    return bq_schema
-
-
-
-
+    print("Upload Successful")
 
 
 
