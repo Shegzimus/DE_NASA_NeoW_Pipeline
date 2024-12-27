@@ -29,3 +29,4 @@ terraform/tests/fixtures.py
 
 directory_structure.txt
 
+terraform/terraform.tfstate.backup

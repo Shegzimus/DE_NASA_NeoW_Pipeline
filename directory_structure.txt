@@ -1,7 +1,11 @@
-project-root/
-│
-├── airflow/             # Airflow DAGs, plugins, etc.
-├── terraform/           # Infrastructure as code for GCS, BigQuery, etc.
+project-root/  
+    ── airflow/             
+        ├── dags/
+        ├── pipelines
+        ├── tests
+        ├── utils
+    ── assets/              # Screenshots and images
+    ── terraform/           # Infrastructure as code for GCS, BigQuery, etc.
 ├── dbt/                 # DBT models and configuration
 │   ├── models/          # SQL models for transformations
 │   ├── tests/           # Tests for data validation
