@@ -19,15 +19,14 @@ from pipelines.extract import (generate_time_range,
 from pipelines.transform import (transform_batch_close_approach,
                                  transform_neo_feed_batch)
 
-from pipelines.load import (load_batch_close_approach_data,
-                            load_batch_neo_feed_data)
+from pipelines.load import upload_folder_to_gcs
 
 
 
 API_KEY = nasa_api_key
 today_date = datetime.now().date()
 start_date, end_date, postfix = generate_time_range(today_date)
-
+BUCKET_NAME = 'de_data_lake_nasa-neows'
 
 # Define the DAG and default args
 default_args = {
@@ -118,7 +117,11 @@ Task 6: Upload the Close approach data
 
 upload_batch_close_approach_task = PythonOperator(
     task_id='upload_batch_close_approach',
-    python_callable=load_batch_close_approach_data,
+    python_callable=upload_folder_to_gcs(
+        bucket_name=BUCKET_NAME,
+        local_folder="opt/airflow/data/output/batch/close_approach",
+        target_folder_prefix='batch/close_approach/'
+    ),
     dag=dag
 )
 
@@ -126,11 +129,16 @@ upload_batch_close_approach_task = PythonOperator(
 Task 7: Upload the Neo feed data
 
 """
-upload_batch_neo_feed_task = PythonOperator(
-    task_id='upload_batch_neo_feed',
-    python_callable=load_batch_neo_feed_data,
-    dag=dag  # Use the same DAG as the previous tasks to ensure data dependencies are correctly set up.  # noqa: E501
+upload_batch_neo_feed_task =PythonOperator(
+    task_id='upload_batch_close_approach',
+    python_callable=upload_folder_to_gcs(
+        bucket_name=BUCKET_NAME,
+        local_folder="opt/airflow/data/output/batch/neo_feed",
+        target_folder_prefix='batch/neo_feed/'
+    ),
+    dag=dag
 )
+
 
 Begin = DummyOperator(task_id="Begin", dag=dag)
 End = DummyOperator(task_id="End", dag=dag)
