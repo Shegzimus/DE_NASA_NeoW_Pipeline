@@ -7,10 +7,11 @@ airflow/dags/__pycache__
 airflow/config/secrets.conf
 airflow/pipelines/lab.py
 airflow/pipelines/2nd_lab.py
-airflow\pipelines\uploadlab.py
+airflow/pipelines/uploadlab.py
 airflow/data/input
 airflow/data/output
 airflow/tests/__pycache__/
+airflow/pipelines/uploadlab.py
 
 
 firebase-debug.log
@@ -25,6 +26,6 @@ terraform/tests/__pycache__
 terraform/tests/test_terraform.py
 terraform/tests/fixtures.py
 
+
 directory_structure.txt
-airflow/pipelines/uploadlab.py
-directory_structure.txt
+
