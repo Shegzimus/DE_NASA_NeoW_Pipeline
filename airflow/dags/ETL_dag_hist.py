@@ -154,9 +154,9 @@ Task 3.0: Define the folder paths and their GCS target prefix
 
 bucket_name = BUCKET
 folder_paths = [
-    {"local_folder": "opt/airflow/data/output/historical/asteroid_data", "gcs_prefix": "raw/historical/asteroid_data"},
-    {"local_folder": "opt/airflow/data/output/historical/close_approach", "gcs_prefix": "raw/historical/close_approach"},
-    {"local_folder": "opt/airflow/data/output/historical/neo_feed", "gcs_prefix": "raw/historical/neo_feed"}
+    {"local_folder": "opt/airflow/data/output/historical/asteroid_data", "gcs_prefix": "historical/asteroid_data/"},
+    {"local_folder": "opt/airflow/data/output/historical/close_approach", "gcs_prefix": "historical/close_approach/"},
+    {"local_folder": "opt/airflow/data/output/historical/neo_feed", "gcs_prefix": "historical/neo_feed/"}
 ]
 
 
