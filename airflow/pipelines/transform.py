@@ -198,7 +198,7 @@ def transform_neo_feed_raw(filepath: str) -> None:
     save_to_parquet_trf(df, filename, save_path)
 
 
-def process_hist_neo_feed_in_folder() -> None:
+def transform_hist_neo_feed_in_folder() -> None:
     """
     Walks through the folder and applies the transform_neo_feed_raw function on each file.
     """
@@ -239,7 +239,7 @@ def transform_hist_approach_raw(filepath: str)-> None:
     save_to_parquet_trf(df, filename, save_path)
 
 
-def process_hist_approach_in_folder() -> None:
+def transform_hist_approach_in_folder() -> None:
     """
     Walks through the folder and applies the transform_hist_approach_raw function on each file.
     """
