@@ -6,6 +6,9 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.operators.dummy import DummyOperator
 
+from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
+
+
 # Add the parent directory to the system path for importing the contants file
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -23,7 +26,7 @@ from pipelines.transform import (process_hist_neo_feed_in_folder,
 
 
 
-from pipelines.load import upload_folder_to_gcs, extract_schema_from_parquet
+from pipelines.load import upload_folder_to_gcs
 
 
 
@@ -152,7 +155,6 @@ Task 3.0: Define the folder paths and their GCS target prefix
 
 """
 
-bucket_name = BUCKET
 folder_paths = [
     {"local_folder": "opt/airflow/data/output/historical/asteroid_data", "gcs_prefix": "historical/asteroid_data/"},
     {"local_folder": "opt/airflow/data/output/historical/close_approach", "gcs_prefix": "historical/close_approach/"},
@@ -171,7 +173,7 @@ for folder in folder_paths:
         task_id=f"upload_{os.path.basename(folder['local_folder'])}_to_gcs",
         python_callable=upload_folder_to_gcs,
         op_kwargs={
-            "bucket_name": bucket_name,
+            "bucket_name": BUCKET,
             "local_folder": folder["local_folder"],
             "target_folder_prefix": folder["gcs_prefix"]
         },
@@ -181,10 +183,41 @@ for folder in folder_paths:
     upload_to_gcs_tasks.append(task)
 
 
+load_hist_ast_to_BQ = GCSToBigQueryOperator(
+    task_id='load_hist_to_bq',
+    bucket=BUCKET,
+    source_bucket_object='historical/asteroid_data/neo_browse_asteroid_data.parquet',
+    destination_project_dataset_table=f'{PROJECT_ID}.{STAGING}.asteroid_data',
+    source_format='parquet',
+    autodetect=True,
+    create_disposition='CREATE_IF_NEEDED',
+    write_disposition='WRITE_TRUNCATE',
+    dag=dag
+)
 
+load_hist_neo_to_BQ = GCSToBigQueryOperator(
+    task_id='load_hist_neo_to_BQ',
+    bucket=BUCKET,
+    source_bucket_object='historical/neo_feed/*',
+    destination_project_dataset_table=f'{PROJECT_ID}.{STAGING}.neo_feed',
+    source_format='parquet',
+    autodetect=True,
+    create_disposition='CREATE_IF_NEEDED',
+    write_disposition='WRITE_TRUNCATE',
+    dag=dag
+)
 
-
-
+load_hist_approach_to_BQ = GCSToBigQueryOperator(
+    task_id='load_hist_approach_to_BQ',
+    bucket=BUCKET,
+    source_bucket_object='historical/close_approach/*',
+    destination_project_dataset_table=f'{PROJECT_ID}.{STAGING}.close_approach',
+    source_format='parquet',
+    autodetect=True,
+    create_disposition='CREATE_IF_NEEDED',
+    write_disposition='WRITE_TRUNCATE',
+    dag=dag
+)
 
 
 Begin = DummyOperator(task_id="begin", dag=dag)
@@ -210,4 +243,4 @@ extract_hist_close_approach_task >> extract_hist_neo_data_task >> extract_and_sa
 Extraction_Complete >> process_hist_neo_feed_in_folder_task >> process_hist_approach_in_folder_task >> transform_hist_asteroid_raw_task >> Transformation_Complete
 
 
-Transformation_Complete >>  upload_to_gcs_tasks >> Load_Complete >> End
+Transformation_Complete >>  upload_to_gcs_tasks >> load_hist_ast_to_BQ >> load_hist_neo_to_BQ >> load_hist_approach_to_BQ >> Load_Complete >> End
