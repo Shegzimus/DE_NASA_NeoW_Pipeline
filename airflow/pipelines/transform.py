@@ -35,7 +35,7 @@ def parse_csv(file_path):
     filename = file_path.split('/')[-1].split('.')[0]
     
     # Read the CSV file from the given file path
-    df = pd.read_csv(file_path)
+    df = pd.read_csv(file_path, low_memory=False)
     
     return df, filename
 
@@ -130,7 +130,23 @@ def drop_non_integer_rows(df: pd.DataFrame, column: str) -> pd.DataFrame:
 
     return df
 
+# Convert column to integer
+def cols_to_int(df: pd.DataFrame, *args) -> pd.DataFrame:
+    """
+    Converts specified columns to int data type.
 
+    Parameters:
+        df (pd.DataFrame): The DataFrame to modify.
+        *args: Column names to convert to int.
+
+    Returns:
+        pd.DataFrame: The modified DataFrame with specified columns converted to int.
+    """
+    for col in args:
+        df[col] = pd.to_numeric(df[col], errors='coerce')  # Convert to numeric, invalid values become NaN
+    df.dropna(subset=args, inplace=True)  # Drop rows with NaN in these columns
+    df[list(args)] = df[list(args)].astype(int)  # Convert to integer
+    return df
 
 # Save transformed file to parquet
 def save_to_parquet_trf(df: pd.DataFrame, filename: str, save_path: str) -> None: 
@@ -161,7 +177,7 @@ NEO FEED HISTORICAL TRANSFORM
 """
 
 
-def transform_neo_feed_raw(filepath):
+def transform_neo_feed_raw(filepath: str) -> None:
     """
     Use the helper functions to transform a single file and save as parquet
     """
@@ -171,6 +187,9 @@ def transform_neo_feed_raw(filepath):
     df = cols_to_datetime(df, 'close_approach_date')
     df = cols_to_string(df, 'name', 'nasa_jpl_url')
     df = drop_duplicates(df, subset=['id', 'name'])
+
+    # Replace '.' in column names with '_'
+    df.columns = df.columns.str.replace('.', '_', regex=False)
 
     save_path = 'opt/airflow/data/output/historical/neo_feed/'
 
@@ -199,16 +218,21 @@ CLOSE APPROACH HISTORICAL TRANSFORM
 
 """
 
-def transform_hist_approach_raw(filepath: str):
+def transform_hist_approach_raw(filepath: str)-> None:
     """
     Use the helper functions to transform a single file and save as parquet
+    
     """
 
     df, filename= parse_csv(filepath)
+    df = drop_duplicates(df, subset=['id', 'close_approach_date', 'close_approach_date_full'])
+    df = drop_columns(df, 'orbiting_body')
 
     df = cols_to_datetime(df, 'close_approach_date', 'close_approach_date_full')
-    df = drop_columns(df, 'orbiting_body')
-    df = drop_duplicates(df, subset=['id', 'close_approach_date', 'close_approach_date_full'])
+    df = cols_to_int(df, 'id')
+
+    # Replace '.' in column names with '_'
+    df.columns = df.columns.str.replace('.', '_', regex=False)
     print(df.info())
 
     save_path = 'opt/airflow/data/output/historical/close_approach'
@@ -232,44 +256,66 @@ ASTEROID DATA HISTORICAL TRANSFORM
 
 """
 
-def transform_hist_asteroid_raw():
+def transform_hist_asteroid_raw() -> None:
     """
-    Use the helper functions to transform a single file and save as parquet
-    """
-    filepath = 'airflow/data/input/historical/asteroid_data/csv/neo_browse_asteroid_data.csv'
+    Use helper functions to transform a single file and save it as a Parquet file.
     
+    """
+
+    # paths
+    filepath = 'opt/airflow/data/input/historical/asteroid_data/csv/neo_browse_asteroid_data.csv'
+    save_path = 'opt/airflow/data/output/historical/asteroid_data/'
+
+    # Parse CSV file
     df, filename = parse_csv(filepath)
 
-    df = cols_to_datetime(df, 
-                          'orbital_data.orbit_determination_date', 
-                          'orbital_data.first_observation_date',
-                          'orbital_data.last_observation_date',
-                          )
-    
-    df = drop_columns(df,
-                      'designation', 
-                      'close_approach_data',
-                      'links.self',
-                      'sentry_data',
-                      'neo_reference_id')
-    
-    df = cols_to_string(df, 
-                        'name', 
-                        'name_limited', 
-                        'nasa_jpl_url', 
-                        'orbital_data.equinox',
-                        'orbital_data.orbit_class.orbit_class_type',
-                        'orbital_data.orbit_class.orbit_class_range',
-                        'orbital_data.orbit_class.orbit_class_description',
-                        'orbital_data.orbit_id'
-                        )
-    
+    df = df.dropna(subset=['id'])
+
+    # Replace '.' in column names with '_'
+    df.columns = df.columns.str.replace('.', '_', regex=False)
+
+    # Convert specific columns to datetime
+    df = cols_to_datetime(
+        df,
+        'orbital_data_orbit_determination_date',
+        'orbital_data_first_observation_date',
+        'orbital_data_last_observation_date',
+    )
+
+    # Drop unnecessary columns
+    df = drop_columns(
+        df,
+        'designation',
+        'close_approach_data',
+        'links_self',
+        'sentry_data',
+        'neo_reference_id'
+    )
+
+    # Convert specific columns to string
+    df = cols_to_string(
+        df,
+        'name',
+        'name_limited',
+        'nasa_jpl_url',
+        'orbital_data_equinox',
+        'orbital_data_orbit_class_orbit_class_type',
+        'orbital_data_orbit_class_orbit_class_range',
+        'orbital_data_orbit_class_orbit_class_description',
+        'orbital_data_orbit_id'
+    )
+
+    # Drop rows with non-integer values in the 'id' column
     drop_non_integer_rows(df, 'id')
 
+    df = cols_to_int(df, 'id')
+
+    # Display dataframe info for debugging
     print(df.info())
 
-    save_path = 'opt/airflow/data/output/historical/asteroid_data/'
+    # Save the transformed dataframe to Parquet
     save_to_parquet_trf(df, filename, save_path)
+
 
 
 ##################################################################################################
@@ -279,16 +325,21 @@ def transform_hist_asteroid_raw():
 BATCH CLOSE APPROACH
 
 """
-def transform_batch_close_approach(execution_date):
+def transform_batch_close_approach(execution_date: datetime) -> None:
     
 
     start_date, end_date, file_postfix = generate_time_range(execution_date)
     filepath = f'airflow/data/input/batch/close_approach/csv/{file_postfix}.csv'
     df, filename= parse_csv(filepath)
 
-    df = cols_to_datetime(df, 'close_approach_date', 'close_approach_date_full')
     df = drop_columns(df, 'orbiting_body')
     df = drop_duplicates(df, subset=['id', 'close_approach_date', 'close_approach_date_full'])
+    
+    df = cols_to_datetime(df, 'close_approach_date', 'close_approach_date_full')
+    df = cols_to_int(df, 'id')
+    # Replace '.' in column names with '_'
+    df.columns = df.columns.str.replace('.', '_', regex=False)
+
     print(df.info())
 
     save_path = 'opt/airflow/data/output/batch/close_approach'
@@ -299,7 +350,7 @@ def transform_batch_close_approach(execution_date):
 BATCH NEO FEED
 
 """
-def transform_neo_feed_batch(execution_date):
+def transform_neo_feed_batch(execution_date: datetime) -> None:
     """
     Use the helper functions to transform a single file and save as parquet
     """
@@ -311,6 +362,9 @@ def transform_neo_feed_batch(execution_date):
     df = cols_to_datetime(df, 'close_approach_date')
     df = cols_to_string(df, 'name', 'nasa_jpl_url')
     df = drop_duplicates(df, subset=['id', 'name'])
+
+    # Replace '.' in column names with '_'
+    df.columns = df.columns.str.replace('.', '_', regex=False)
 
     save_path = 'opt/airflow/data/output/batch/neo_feed/'
 
