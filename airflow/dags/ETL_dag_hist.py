@@ -20,8 +20,8 @@ from pipelines.extract import (test_api_call,
                                extract_hist_close_approach,
                                extract_and_save_ast_data)
 
-from pipelines.transform import (process_hist_neo_feed_in_folder,
-                                 process_hist_approach_in_folder,
+from pipelines.transform import (transform_hist_neo_feed_in_folder,
+                                 transform_hist_approach_in_folder,
                                  transform_hist_asteroid_raw)
 
 
@@ -120,7 +120,7 @@ Task 2.0: Transform the neo feed data
 
 process_hist_neo_feed_in_folder_task = PythonOperator(
     task_id='process_hist_neo_feed_in_folder',
-    python_callable=process_hist_neo_feed_in_folder,
+    python_callable=transform_hist_neo_feed_in_folder,
     dag=dag
 )
 
@@ -131,7 +131,7 @@ Task 2.1: Transform the close approach data
 
 process_hist_approach_in_folder_task = PythonOperator(
     task_id='process_hist_approach_in_folder',
-    python_callable=process_hist_approach_in_folder,
+    python_callable=transform_hist_approach_in_folder,
     dag=dag
 )
 
