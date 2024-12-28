@@ -8,7 +8,6 @@ x-airflow-common:
   env_file:
     - airflow.env
   volumes:
-    - ./.google/fashionimages-441305-8e0ac87a473e.json:/opt/airflow/.google/nasa-neows-c12d19292fad.json 
     - ./config:/opt/airflow/config
     - ./dags:/opt/airflow/dags
     - ./data:/opt/airflow/data
@@ -25,7 +24,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: airflow_kaggle
+      POSTGRES_DB: airflow
       POSTGRES_PORT: 5432
     ports:
       - "5432:5432"
@@ -73,3 +72,9 @@ services:
 
 volumes:
   postgres_data:
+
+secrets:
+  google_service_account:
+    external: true
+  api_key_config:
+    external: true

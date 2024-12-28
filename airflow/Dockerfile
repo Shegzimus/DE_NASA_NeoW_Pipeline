@@ -5,7 +5,7 @@ FROM apache/airflow:2.10.2-python3.11
 ENV AIRFLOW_HOME=/opt/airflow
 ENV GCLOUD_HOME=/home/google-cloud-sdk
 ENV PATH="${GCLOUD_HOME}/bin/:${PATH}"
-ENV GOOGLE_APPLICATION_CREDENTIALS=/opt/airflow/.google/nasa-neows-c12d19292fad.json
+
 
 # Set the Airflow user ID
 ARG AIRFLOW_UID=50000
@@ -42,7 +42,7 @@ RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 # Copy Google Cloud credentials
-COPY ./airflow/.google/nasa-neows-c12d19292fad.json /opt/airflow/.google/nasa-neows-c12d19292fad.json
+# COPY ./airflow/.google/nasa-neows-c12d19292fad.json /opt/airflow/.google/nasa-neows-c12d19292fad.json
 
 
 # Set appropriate permissions for credentials
