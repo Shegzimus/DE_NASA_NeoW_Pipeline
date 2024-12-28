@@ -97,3 +97,9 @@
 - Need to refactor the upload function from my fashion image project into something that I can use
 - Once I'm done with the functionality and DAGs, I will focus on tests for both the pipeline modules and the terraform files.
 - Maybe I should split the modules into batch and historical versions for clarity and hypothetical maintainability.
+
+## [2024-12-28]
+**Time**: `04:19 AM`
+- I used terraform to create folders within the bucket for historical and batch data. I had to specify an empty content " " to represent an empty folder.
+- Two field names were somehow concatenated after using the field names to create schema fields for big query.
+- I'm thinking of deploying Prometheus for monitoring purposes.
