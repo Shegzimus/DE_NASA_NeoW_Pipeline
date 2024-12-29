@@ -55,6 +55,9 @@ services:
               airflow db upgrade && 
               airflow users create --username admin --firstname admin --lastname admin --role Admin --email airflow@airflow.com --password admin"
     restart: "no"
+    depends_on:
+      - postgres
+      - redis
 
   airflow-webserver:
     <<: *airflow-common
