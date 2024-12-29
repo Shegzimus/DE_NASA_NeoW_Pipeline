@@ -109,4 +109,4 @@
 **Time**: `07:05 AM`
 - I tried to spin up the docker image and containers for the solution.
 - After creating the secrets for the API key and service account credentials, I adjusted the .env file to reflect the same.
-- I ran into compatibility issues with the pywin32==308 package which is designed for windows but the base image is linux-based. I tried specifying the platform requirements using pywin32==308; sys_platform == "win32" but the airflow-init container rejects it. This seemed to make the CLI commands for the CeleryExecutor the fail.
+- I ran into compatibility issues with the pywin32==308 package which is designed for windows but the base image is linux-based. I tried specifying the platform requirements using pywin32==308; sys_platform == "win32" but the airflow-init container rejects it. This seemed to make the CLI commands for the CeleryExecutor in the init process to fail.
