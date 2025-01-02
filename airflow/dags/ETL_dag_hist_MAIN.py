@@ -180,7 +180,7 @@ def load_dag():
     load_hist_ast_to_BQ = GCSToBigQueryOperator(
     task_id='load_hist_to_bq',
     bucket=BUCKET,
-    source_bucket_object='historical/asteroid_data/neo_browse_asteroid_data.parquet',
+    source_objects='historical/asteroid_data/neo_browse_asteroid_data.parquet',
     destination_project_dataset_table=f'{PROJECT_ID}.{STAGING}.asteroid_data',
     source_format='parquet',
     autodetect=True,
@@ -191,7 +191,7 @@ def load_dag():
     load_hist_neo_to_BQ = GCSToBigQueryOperator(
     task_id='load_hist_neo_to_BQ',
     bucket=BUCKET,
-    source_bucket_object='historical/neo_feed/*',
+    source_objects='historical/neo_feed/*',
     destination_project_dataset_table=f'{PROJECT_ID}.{STAGING}.neo_feed',
     source_format='parquet',
     autodetect=True,
@@ -202,7 +202,7 @@ def load_dag():
     load_hist_approach_to_BQ = GCSToBigQueryOperator(
     task_id='load_hist_approach_to_BQ',
     bucket=BUCKET,
-    source_bucket_object='historical/close_approach/*',
+    source_objects='historical/close_approach/*',
     destination_project_dataset_table=f'{PROJECT_ID}.{STAGING}.close_approach',
     source_format='parquet',
     autodetect=True,
