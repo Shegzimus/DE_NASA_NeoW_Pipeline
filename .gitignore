@@ -14,10 +14,11 @@ airflow/tests/__pycache__/
 airflow/pipelines/uploadlab.py
 
 
+# Logs
 firebase-debug.log
+airflow/logs
 
-
-
+# Terraform
 terraform/.terraform
 terraform/nasa-neows-c12d19292fad.json
 terraform/.terraform.lock.hcl
@@ -25,8 +26,8 @@ terraform/terraform.tfstate
 terraform/tests/__pycache__
 terraform/tests/test_terraform.py
 terraform/tests/fixtures.py
-
+terraform/terraform.tfstate.backup
 
 directory_structure.txt
 
-terraform/terraform.tfstate.backup
+
