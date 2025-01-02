@@ -207,11 +207,6 @@ def request_api_neo_feed(START_DATE: datetime, END_DATE: datetime, API_KEY: str)
 
 
 
-
-
-
-
-
 """
 HISTORICAL EXTRACTORS
 
@@ -268,8 +263,6 @@ def fetch_all_ast_pages() -> list:
             pbar.update(1)
 
     return all_data
-
-
 
 
 # ========================================= NEO DATA ========================================================
