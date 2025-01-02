@@ -7,9 +7,10 @@ import json
 import pandas as pd
 from tqdm import tqdm
 from typing import List, Tuple
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from utils.constants import nasa_api_key, INPUT_PATH
+from utils.constants import nasa_api_key
 
 """
 NEO FEED BATCH EXTRACTORS
@@ -384,3 +385,5 @@ def save_df_to_parquet(df: pd.json_normalize, file_postfix: str, path: str)-> No
 
 
 
+if __name__ == '__main__':
+    pass
