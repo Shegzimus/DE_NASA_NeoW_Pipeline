@@ -14,163 +14,6 @@ from pipelines.extract import generate_time_range
 
 
 """
-HELPER FUNCTIONS
-
-"""
-
-
-# Parse files
-def parse_csv(file_path):
-    """
-    Parses a CSV file into a Pandas DataFrame from a dynamic file path.
-    
-    Parameters:
-    file_path (str): The full path of the CSV file to parse.
-    
-    Returns:
-    pd.DataFrame: DataFrame parsed from the CSV file.
-    str: The filename (without path or extension).
-    """
-    # Extract the filename without extension from the full file path
-    filename = file_path.split('/')[-1].split('.')[0]
-    
-    # Read the CSV file from the given file path
-    df = pd.read_csv(file_path, low_memory=False)
-    
-    return df, filename
-
-# Remove unwanted columns
-def drop_columns(df: pd.DataFrame, *args) -> pd.DataFrame:
-    """
-    Drops specified columns from the DataFrame.
-
-    Parameters:
-        df (pd.DataFrame): The DataFrame to modify.
-        *args: Column names to drop.
-
-    Returns:
-        pd.DataFrame: A new DataFrame with the specified columns dropped.
-    """
-    df_dropped = df.drop(columns=list(args), errors='ignore')
-    return df_dropped
-
-# Fix schema
-def cols_to_string(df: pd.DataFrame, *args) -> pd.DataFrame:
-    """
-    Converts specified columns to string data type.
-
-    Parameters:
-        df (pd.DataFrame): The DataFrame to modify.
-        *args: Column names to convert to string.
-
-    Returns:
-        pd.DataFrame: The modified DataFrame with specified columns converted to string.
-    """
-    df[list(args)] = df[list(args)].astype(pd.StringDtype())
-    return df
-
-
-def cols_to_datetime(df: pd.DataFrame, *args) -> pd.DataFrame:
-    """
-    Converts specified columns to datetime data type in a Pandas DataFrame.
-
-    Parameters:
-    df (pd.DataFrame): The DataFrame where the columns are to be converted.
-    *args: Variable length argument list. Each argument represents a column name to be converted to datetime.
-
-    Returns:
-    pd.DataFrame: The modified DataFrame with specified columns converted to datetime data type.
-    """
-    for col in args:
-        # Explicitly parse dates using pd.to_datetime
-        df[col] = pd.to_datetime(df[col], errors='coerce')  # Ensures invalid dates turn into NaT
-    return df
-
-
-# Handle Duplicates
-def drop_duplicates(df: pd.DataFrame, subset: list = None, keep: str = "first") -> pd.DataFrame:
-    """
-    Drops duplicate rows from the DataFrame.
-
-    Parameters:
-        df (pd.DataFrame): The input DataFrame.
-        subset (list): Optional list of column names to consider for identifying duplicates.
-                       If None, all columns are considered.
-        keep (str): Which duplicate to keep: "first", "last", or False (drops all duplicates).
-
-    Returns:
-        pd.DataFrame: A DataFrame with duplicates removed.
-    """
-    return df.drop_duplicates(subset=subset, keep=keep).reset_index(drop=True)
-
-
-def drop_non_integer_rows(df: pd.DataFrame, column: str) -> pd.DataFrame:
-    """
-    Drops rows where the specified column cannot be converted to integers.
-
-    Parameters:
-        df (pd.DataFrame): The DataFrame to modify.
-        column (str): The column to check for integer conversion.
-
-    Returns:
-        pd.DataFrame: The modified DataFrame with non-integer rows removed.
-    """
-    def is_integer(value):
-        try:
-            int(value)
-            return True
-        except ValueError:
-            return False
-
-    # Filter the DataFrame to keep only rows where the column contains valid integers
-    filtered_df = df[df[column].apply(is_integer)].copy()
-
-    # Optionally, convert the column to integers after filtering
-    df[column] = filtered_df[column].astype(int)
-
-    return df
-
-# Convert column to integer
-def cols_to_int(df: pd.DataFrame, *args) -> pd.DataFrame:
-    """
-    Converts specified columns to int data type.
-
-    Parameters:
-        df (pd.DataFrame): The DataFrame to modify.
-        *args: Column names to convert to int.
-
-    Returns:
-        pd.DataFrame: The modified DataFrame with specified columns converted to int.
-    """
-    for col in args:
-        df[col] = pd.to_numeric(df[col], errors='coerce')  # Convert to numeric, invalid values become NaN
-    df.dropna(subset=args, inplace=True)  # Drop rows with NaN in these columns
-    df[list(args)] = df[list(args)].astype(int)  # Convert to integer
-    return df
-
-# Save transformed file to parquet
-def save_to_parquet_trf(df: pd.DataFrame, filename: str, save_path: str) -> None: 
-    """
-    Saves a DataFrame to a Parquet file.
-
-    This function takes a DataFrame, a filename, and a save_path as input. It then constructs a file path by combining the save_path and filename,
-    appending a '.parquet' extension to the filename. The DataFrame is then saved to the constructed file path in Parquet format, with the index set to False.
-
-    Parameters:
-    df (pd.DataFrame): The DataFrame to be saved.
-    filename (str): The name of the file (without extension) where the DataFrame will be saved.
-    save_path (str): The directory path where the file will be saved.
-
-    Returns:
-    None: The function does not return any value. It saves the DataFrame to a Parquet file.
-    """
-
-    df.to_parquet(f'{save_path}/{filename}.parquet', index=False)
-
-
-
-
-"""
 
 NEO FEED HISTORICAL TRANSFORM
 
@@ -371,3 +214,162 @@ def transform_neo_feed_batch(execution_date: datetime) -> None:
     print(f"\nProcessing file: {filename}\n{'-' *100}")
     print(df.info())
     save_to_parquet_trf(df, filename, save_path)
+
+
+
+
+"""
+HELPER FUNCTIONS
+
+"""
+
+
+# Parse files
+def parse_csv(file_path):
+    """
+    Parses a CSV file into a Pandas DataFrame from a dynamic file path.
+    
+    Parameters:
+    file_path (str): The full path of the CSV file to parse.
+    
+    Returns:
+    pd.DataFrame: DataFrame parsed from the CSV file.
+    str: The filename (without path or extension).
+    """
+    # Extract the filename without extension from the full file path
+    filename = file_path.split('/')[-1].split('.')[0]
+    
+    # Read the CSV file from the given file path
+    df = pd.read_csv(file_path, low_memory=False)
+    
+    return df, filename
+
+# Remove unwanted columns
+def drop_columns(df: pd.DataFrame, *args) -> pd.DataFrame:
+    """
+    Drops specified columns from the DataFrame.
+
+    Parameters:
+        df (pd.DataFrame): The DataFrame to modify.
+        *args: Column names to drop.
+
+    Returns:
+        pd.DataFrame: A new DataFrame with the specified columns dropped.
+    """
+    df_dropped = df.drop(columns=list(args), errors='ignore')
+    return df_dropped
+
+# Fix schema
+def cols_to_string(df: pd.DataFrame, *args) -> pd.DataFrame:
+    """
+    Converts specified columns to string data type.
+
+    Parameters:
+        df (pd.DataFrame): The DataFrame to modify.
+        *args: Column names to convert to string.
+
+    Returns:
+        pd.DataFrame: The modified DataFrame with specified columns converted to string.
+    """
+    df[list(args)] = df[list(args)].astype(pd.StringDtype())
+    return df
+
+
+def cols_to_datetime(df: pd.DataFrame, *args) -> pd.DataFrame:
+    """
+    Converts specified columns to datetime data type in a Pandas DataFrame.
+
+    Parameters:
+    df (pd.DataFrame): The DataFrame where the columns are to be converted.
+    *args: Variable length argument list. Each argument represents a column name to be converted to datetime.
+
+    Returns:
+    pd.DataFrame: The modified DataFrame with specified columns converted to datetime data type.
+    """
+    for col in args:
+        # Explicitly parse dates using pd.to_datetime
+        df[col] = pd.to_datetime(df[col], errors='coerce')  # Ensures invalid dates turn into NaT
+    return df
+
+
+# Handle Duplicates
+def drop_duplicates(df: pd.DataFrame, subset: list = None, keep: str = "first") -> pd.DataFrame:
+    """
+    Drops duplicate rows from the DataFrame.
+
+    Parameters:
+        df (pd.DataFrame): The input DataFrame.
+        subset (list): Optional list of column names to consider for identifying duplicates.
+                       If None, all columns are considered.
+        keep (str): Which duplicate to keep: "first", "last", or False (drops all duplicates).
+
+    Returns:
+        pd.DataFrame: A DataFrame with duplicates removed.
+    """
+    return df.drop_duplicates(subset=subset, keep=keep).reset_index(drop=True)
+
+
+def drop_non_integer_rows(df: pd.DataFrame, column: str) -> pd.DataFrame:
+    """
+    Drops rows where the specified column cannot be converted to integers.
+
+    Parameters:
+        df (pd.DataFrame): The DataFrame to modify.
+        column (str): The column to check for integer conversion.
+
+    Returns:
+        pd.DataFrame: The modified DataFrame with non-integer rows removed.
+    """
+    def is_integer(value):
+        try:
+            int(value)
+            return True
+        except ValueError:
+            return False
+
+    # Filter the DataFrame to keep only rows where the column contains valid integers
+    filtered_df = df[df[column].apply(is_integer)].copy()
+
+    # Optionally, convert the column to integers after filtering
+    df[column] = filtered_df[column].astype(int)
+
+    return df
+
+# Convert column to integer
+def cols_to_int(df: pd.DataFrame, *args) -> pd.DataFrame:
+    """
+    Converts specified columns to int data type.
+
+    Parameters:
+        df (pd.DataFrame): The DataFrame to modify.
+        *args: Column names to convert to int.
+
+    Returns:
+        pd.DataFrame: The modified DataFrame with specified columns converted to int.
+    """
+    for col in args:
+        df[col] = pd.to_numeric(df[col], errors='coerce')  # Convert to numeric, invalid values become NaN
+    df.dropna(subset=args, inplace=True)  # Drop rows with NaN in these columns
+    df[list(args)] = df[list(args)].astype(int)  # Convert to integer
+    return df
+
+# Save transformed file to parquet
+def save_to_parquet_trf(df: pd.DataFrame, filename: str, save_path: str) -> None: 
+    """
+    Saves a DataFrame to a Parquet file.
+
+    This function takes a DataFrame, a filename, and a save_path as input. It then constructs a file path by combining the save_path and filename,
+    appending a '.parquet' extension to the filename. The DataFrame is then saved to the constructed file path in Parquet format, with the index set to False.
+
+    Parameters:
+    df (pd.DataFrame): The DataFrame to be saved.
+    filename (str): The name of the file (without extension) where the DataFrame will be saved.
+    save_path (str): The directory path where the file will be saved.
+
+    Returns:
+    None: The function does not return any value. It saves the DataFrame to a Parquet file.
+    """
+
+    df.to_parquet(f'{save_path}/{filename}.parquet', index=False)
+
+
