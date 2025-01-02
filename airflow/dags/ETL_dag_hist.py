@@ -31,7 +31,7 @@ from pipelines.load import upload_folder_to_gcs
 
 
 API_KEY = nasa_api_key
-today_date = datetime.now().strftime("%Y-%m-%d")
+today_date = datetime.now()
 start_date, end_date, postfix = generate_time_range(today_date)
 
 # Retrieve variables from Airflow environment
