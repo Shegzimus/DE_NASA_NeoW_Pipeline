@@ -10,10 +10,9 @@ ENV PATH="${GCLOUD_HOME}/bin/:${PATH}"
 # Set the Airflow user ID
 ARG AIRFLOW_UID=50000
 
-# Switch to root to install necessary tools
-USER root
 
 # Install necessary packages
+USER root
 RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends \
         curl \
@@ -41,8 +40,6 @@ COPY requirements.txt .
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Copy Google Cloud credentials
-# COPY ./airflow/.google/nasa-neows-c12d19292fad.json /opt/airflow/.google/nasa-neows-c12d19292fad.json
 
 
 # Set appropriate permissions for credentials
