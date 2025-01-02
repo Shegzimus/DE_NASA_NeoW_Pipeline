@@ -100,6 +100,10 @@ def generate_gcs_target_path(local_file_path: str, local_folder: str, target_fol
 
 
 
+if __name__ == '__main__':
+    pass
+
+
 
 
 

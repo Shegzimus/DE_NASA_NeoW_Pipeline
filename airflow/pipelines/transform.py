@@ -373,3 +373,10 @@ def save_to_parquet_trf(df: pd.DataFrame, filename: str, save_path: str) -> None
     df.to_parquet(f'{save_path}/{filename}.parquet', index=False)
 
 
+
+
+
+
+
+if __name__ == '__main__':
+    pass
