@@ -3,6 +3,8 @@
 - [Table of Contents](#table-of-contents)
   - [Motivation and Objectives](#motivation-and-objectives)
   - [Overview](#overview)
+    - [Key Features](#key-features)
+    - [Architecture Overview](#architecture-overview)
   - [Architecture](#architecture)
   - [New Personal Insights](#new-personal-insights)
   - [Prerequisites](#prerequisites)
@@ -11,8 +13,37 @@
 
 ## Motivation and Objectives
 
-
+---
 ## Overview
+
+The **DE_NASA_NeoW_Pipeline** project is an end-to-end data engineering pipeline designed to fetch, process, and analyze Near-Earth Object (NEO) data provided by NASA's APIs. The pipeline leverages cloud infrastructure, containerization, and orchestration tools to ensure scalability, reliability, and ease of deployment.
+
+### Key Features
+- **Data Collection**: Fetches NEO data from NASA's API with efficient pagination and stores it for further processing.
+- **Data Transformation**: Processes raw data using Python and prepares it for analytical use.
+- **Cloud Integration**: Uses Google Cloud Platform (GCP) services like BigQuery and Cloud Storage for data storage and querying.
+- **Orchestration**: Employs Apache Airflow for task scheduling and pipeline management.
+- **Containerization**: Encapsulates the entire solution in Docker containers for consistent execution across environments.
+- **Scalability**: Ensures the pipeline can handle growing data volumes with cloud-native tools and distributed architecture.
+
+### Architecture Overview
+1. **Data Ingestion**:
+   - Extracts data from NASA's NEO API.
+   - Processes and validates the data.
+2. **Data Storage**:
+   - Stores raw and processed data in Google Cloud Storage (GCS).
+   - Loads transformed data into BigQuery for analysis.
+3. **Data Analysis**:
+   - Facilitates querying and reporting using BigQuery and tools like Looker Studio.
+4. **Pipeline Management**:
+   - Automated workflows and monitoring via Apache Airflow.
+5. **Deployment**:
+   - Dockerized solution for deployment on local machines or cloud environments.
+
+This project demonstrates best practices in modern data engineering and serves as a template for building scalable ETL pipelines.
+
+--- 
+
 
 
 
@@ -28,11 +59,49 @@
 
 
 ## Prerequisites
+1. **Google Cloud Platform (GCP) Account**
+   - Visit the GCP Console and create a new project.
+   - Enable the required APIs for your project (e.g., BigQuery, Cloud Storage).
+   - Create a service account with appropriate roles (e.g., BigQuery Admin, Storage Admin).
+   - Download the service account key JSON file.
+    --- 
+2. **Python**
+   - Install Python 3.7 or higher. Verify installation by running:
+    ```bash
+    python3 --version
+    ```
+    --- 
+  - Ensure pip is installed and updated:
+    ```bash
+    python3 -m pip install --upgrade pip
+    ```
+    --- 
+3. **Docker**
+   - Download and install Docker from Docker's official website.
+  - After installation, verify Docker is installed correctly by running:
+    ```bash
+    docker --version
+    ```
+  - Verify that docker-compose is installed
+    ```
+    docker-compose --version
+    ```
+    --- 
+4. **Git**
+   - Install Git to clone the repository. Confirm installation
+    ```
+    git --version
+    ```
+    --- 
+5. **System Resources**
+    - RAM: At least 8GB.
+    - Disk Space: 10GB or more free space for Docker images and logs.
+    - CPU: Dual-core processor or higher.
+    --- 
+6. **Internet Access**
 
-
-
-
-
+   - Stable internet connection to install dependencies and interact with GCP services.
+--- 
 
 ## System Configuration
 1. Clone the repository
@@ -57,10 +126,7 @@
    ```
 
 5. Set up your Google Cloud Platform (GCP) account
-   - Visit the GCP Console and create a new project.
-   - Enable the required APIs for your project (e.g., BigQuery, Cloud Storage).
-   - Create a service account with appropriate roles (e.g., BigQuery Admin, Storage Admin).
-   - Download the service account key JSON file.
+   - 
 
 6. Create directories to store your google credentials
    ```bash
@@ -71,16 +137,7 @@
    - Rename the file to "credentials.json" for consistency.
 
 7. Install Docker
-   - Download and install Docker from Docker's official website.
-   - After installation, verify Docker is installed correctly by running:
-    ```bash
-    docker --version
-    ```
-
-8. Verify that docker-compose is installed
-    ```
-    docker-compose --version
-    ```
+   
 
 8. Build the Docker image
    ```bash
