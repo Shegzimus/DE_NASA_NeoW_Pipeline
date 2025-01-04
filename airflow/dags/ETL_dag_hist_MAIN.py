@@ -80,12 +80,12 @@ def extract_dag():
         op_kwargs={"start_date": datetime(2024, 1, 1)},
     )
     
-    extract_ast_data_task = PythonOperator(
-        task_id="extract_ast_data",
-        python_callable=extract_and_save_ast_data,
-        op_kwargs={"start_date": datetime(2024, 1, 1)},
-    )
-    extract_close_approach_task >> extract_neo_feed_task >> extract_ast_data_task
+    # extract_ast_data_task = PythonOperator(
+    #     task_id="extract_ast_data",
+    #     python_callable=extract_and_save_ast_data,
+    #     op_kwargs={"start_date": datetime(2024, 1, 1)},
+    # )
+    extract_close_approach_task >> extract_neo_feed_task 
 
 extract = extract_dag()
 
@@ -125,12 +125,12 @@ def transform_dag():
         op_kwargs={"start_date": datetime(2020, 1, 1)},
     )
 
-    transform_hist_ast_task = PythonOperator(
-        task_id="transform_ast_data",
-        python_callable=transform_hist_asteroid_raw,
-        op_kwargs={"start_date": datetime(2020, 1, 1)},
-    )
-    transform_hist_close_approach_task >> transform_hist_neo_feed_task >> transform_hist_ast_task
+    # transform_hist_ast_task = PythonOperator(
+    #     task_id="transform_ast_data",
+    #     python_callable=transform_hist_asteroid_raw,
+    #     op_kwargs={"start_date": datetime(2020, 1, 1)},
+    # )
+    transform_hist_close_approach_task >> transform_hist_neo_feed_task
 
 transform = transform_dag()
 
@@ -162,7 +162,7 @@ def load_dag():
     WAREHOUSE = os.environ.get("BQ_DATASET_WAREHOUSE")
 
     folder_paths = [
-    {"local_folder": "opt/airflow/data/output/historical/asteroid_data", "gcs_prefix": "historical/asteroid_data/"},
+    # {"local_folder": "opt/airflow/data/output/historical/asteroid_data", "gcs_prefix": "historical/asteroid_data/"},
     {"local_folder": "opt/airflow/data/output/historical/close_approach", "gcs_prefix": "historical/close_approach/"},
     {"local_folder": "opt/airflow/data/output/historical/neo_feed", "gcs_prefix": "historical/neo_feed/"}
     ]
@@ -181,16 +181,16 @@ def load_dag():
         )
         upload_to_gcs_tasks.append(task)
     
-    load_hist_ast_to_BQ = GCSToBigQueryOperator(
-    task_id='load_hist_to_bq',
-    bucket=BUCKET,
-    source_objects='historical/asteroid_data/neo_browse_asteroid_data.parquet',
-    destination_project_dataset_table=f'{PROJECT_ID}.{STAGING}.asteroid_data',
-    source_format='parquet',
-    autodetect=True,
-    create_disposition='CREATE_IF_NEEDED',
-    write_disposition='WRITE_TRUNCATE'
-    )
+    # load_hist_ast_to_BQ = GCSToBigQueryOperator(
+    # task_id='load_hist_to_bq',
+    # bucket=BUCKET,
+    # source_objects='historical/asteroid_data/neo_browse_asteroid_data.parquet',
+    # destination_project_dataset_table=f'{PROJECT_ID}.{STAGING}.asteroid_data',
+    # source_format='parquet',
+    # autodetect=True,
+    # create_disposition='CREATE_IF_NEEDED',
+    # write_disposition='WRITE_TRUNCATE'
+    # )
 
     load_hist_neo_to_BQ = GCSToBigQueryOperator(
     task_id='load_hist_neo_to_BQ',
@@ -213,7 +213,7 @@ def load_dag():
     create_disposition='CREATE_IF_NEEDED',
     write_disposition='WRITE_TRUNCATE'
     )
-    upload_to_gcs_tasks >> load_hist_ast_to_BQ >> load_hist_neo_to_BQ >> load_hist_approach_to_BQ
+    upload_to_gcs_tasks >> load_hist_neo_to_BQ >> load_hist_approach_to_BQ
 
 load = load_dag()
 
