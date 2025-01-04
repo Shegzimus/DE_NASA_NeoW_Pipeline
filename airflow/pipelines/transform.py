@@ -7,6 +7,7 @@ import json
 import pandas as pd
 from tqdm import tqdm
 from typing import List, Tuple
+import pyarrow as pq
 
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -24,7 +25,7 @@ def transform_neo_feed_raw(filepath: str) -> None:
     """
     Use the helper functions to transform a single file and save as parquet
     """
-    df, filename = parse_csv(filepath)
+    df, filename = parse_parquet(filepath)
 
     df = drop_columns(df, 'links.self', 'sentry_data', 'close_approach_data')
     df = cols_to_datetime(df, 'close_approach_date')
@@ -45,10 +46,10 @@ def transform_hist_neo_feed_in_folder() -> None:
     """
     Walks through the folder and applies the transform_neo_feed_raw function on each file.
     """
-    folder_path = "opt/airflow/data/input/historical/neo_feed/csv/"  # Path where the files are located
+    folder_path = "opt/airflow/data/input/historical/neo_feed/parquet/"  # Path where the files are located
 
     for filename in os.listdir(folder_path):
-        if filename.endswith('.csv'):  # Only process CSV files
+        if filename.endswith('.parquet'):  # Only process parquet files
             file_path = os.path.join(folder_path, filename)  # Get the full file path
             transform_neo_feed_raw(file_path)  # Pass the full file path to the function
 
@@ -67,7 +68,7 @@ def transform_hist_approach_raw(filepath: str)-> None:
     
     """
 
-    df, filename= parse_csv(filepath)
+    df, filename= parse_parquet(filepath)
     df = drop_duplicates(df, subset=['id', 'close_approach_date', 'close_approach_date_full'])
     df = drop_columns(df, 'orbiting_body')
 
@@ -86,12 +87,11 @@ def transform_hist_approach_in_folder() -> None:
     """
     Walks through the folder and applies the transform_hist_approach_raw function on each file.
     """
-    folder_path= "opt/airflow/data/input/historical/close_approach/csv/"
+    folder_path= "opt/airflow/data/input/historical/close_approach"
 
     for filename in os.listdir(folder_path):
-        if filename.endswith('.csv'):  # Only process CSV files
-            file_path = os.path.join(folder_path, filename)  # Get the full file path
-            transform_hist_approach_raw(file_path)  # Pass the full file path to the function
+        file_path = os.path.join(folder_path, filename)  # Get the full file path
+        transform_hist_approach_raw(file_path)  # Pass the full file path to the function
 
 
 """
@@ -106,11 +106,11 @@ def transform_hist_asteroid_raw() -> None:
     """
 
     # paths
-    filepath = 'opt/airflow/data/input/historical/asteroid_data/csv/neo_browse_asteroid_data.csv'
+    filepath = 'opt/airflow/data/input/historical/asteroid_data/parquet/neo_browse_asteroid_data.parquet'
     save_path = 'opt/airflow/data/output/historical/asteroid_data/'
 
-    # Parse CSV file
-    df, filename = parse_csv(filepath)
+    # Parse parquet file
+    df, filename = parse_parquet(filepath)
 
     df = df.dropna(subset=['id'])
 
@@ -172,8 +172,8 @@ def transform_batch_close_approach(execution_date: datetime) -> None:
     
 
     start_date, end_date, file_postfix = generate_time_range(execution_date)
-    filepath = f'airflow/data/input/batch/close_approach/csv/{file_postfix}.csv'
-    df, filename= parse_csv(filepath)
+    filepath = f'airflow/data/input/batch/close_approach/parquet/{file_postfix}.parquet'
+    df, filename= parse_parquet(filepath)
 
     df = drop_columns(df, 'orbiting_body')
     df = drop_duplicates(df, subset=['id', 'close_approach_date', 'close_approach_date_full'])
@@ -198,8 +198,8 @@ def transform_neo_feed_batch(execution_date: datetime) -> None:
     Use the helper functions to transform a single file and save as parquet
     """
     start_date, end_date, file_postfix = generate_time_range(execution_date)
-    filepath = f'opt/airflow/data/input/batch/neo_feed/csv/{file_postfix}.csv'
-    df, filename= parse_csv(filepath)
+    filepath = f'opt/airflow/data/input/batch/neo_feed/parquet/{file_postfix}.parquet'
+    df, filename= parse_parquet(filepath)
 
     df = drop_columns(df, 'links.self', 'sentry_data', 'close_approach_data')
     df = cols_to_datetime(df, 'close_approach_date')
@@ -225,22 +225,22 @@ HELPER FUNCTIONS
 
 
 # Parse files
-def parse_csv(file_path):
+def parse_parquet(file_path):
     """
-    Parses a CSV file into a Pandas DataFrame from a dynamic file path.
+    Parses a parquet file into a Pandas DataFrame from a dynamic file path.
     
     Parameters:
-    file_path (str): The full path of the CSV file to parse.
+    file_path (str): The full path of the parquet file to parse.
     
     Returns:
-    pd.DataFrame: DataFrame parsed from the CSV file.
+    pd.DataFrame: DataFrame parsed from the parquet file.
     str: The filename (without path or extension).
     """
     # Extract the filename without extension from the full file path
     filename = file_path.split('/')[-1].split('.')[0]
     
-    # Read the CSV file from the given file path
-    df = pd.read_csv(file_path, low_memory=False)
+    # Read the parquet file from the given file path
+    df = pd.read_parquet(file_path, engine='pyarrow')
     
     return df, filename
 
