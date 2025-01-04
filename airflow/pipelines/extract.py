@@ -321,7 +321,7 @@ def extract_hist_close_approach(execution_date: datetime)-> None:
         except Exception as e:
             print(f"Error processing close approach data for range {start_date} to {end_date}: {e}")
 
-def generate_hist_ranges(start_datetime: str) -> List[Tuple[str, str, str]]:
+def generate_hist_ranges(start_datetime: datetime) -> List[Tuple[str, str, str]]:
     """
     Generate a list of weekly time ranges from the given start date to the current week.
 
@@ -334,10 +334,10 @@ def generate_hist_ranges(start_datetime: str) -> List[Tuple[str, str, str]]:
                                     - end_date_str (str): End date of the week.
                                     - file_postfix (str): A formatted string for file naming.
     """
-    start_date = datetime.strptime(start_datetime, "%Y%m%d")
+    start_date = start_datetime
     current_date = datetime.now()
 
-    time_ranges = []
+    date_ranges = []
     while start_date <= current_date:
         # Calculate the end of the current week
         end_date = start_date + timedelta(days=6)
@@ -352,12 +352,12 @@ def generate_hist_ranges(start_datetime: str) -> List[Tuple[str, str, str]]:
         file_postfix = f"{start_date_str.replace('-', '')}_{end_date_str.replace('-', '')}"
 
         # Append the tuple
-        time_ranges.append((start_date_str, end_date_str, file_postfix))
+        date_ranges.append((start_date_str, end_date_str, file_postfix))
 
         # Move to the next week
         start_date = end_date + timedelta(days=1)
 
-    return time_ranges
+    return date_ranges
 
 def save_df_to_csv(df: pd.json_normalize, file_postfix: str, path: str)-> None:
     """
