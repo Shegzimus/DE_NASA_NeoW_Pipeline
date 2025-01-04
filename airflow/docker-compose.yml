@@ -6,13 +6,13 @@ x-airflow-common:
   env_file:
     - airflow.env
   volumes:
+    - ./.google/nasa-neows-c12d19292fad.json:/opt/airflow/.google/nasa-neows-c12d19292fad.json  
     - ./config:/opt/airflow/config
     - ./dags:/opt/airflow/dags
     - ./data:/opt/airflow/data
     - ./logs:/opt/airflow/logs
     - ./pipelines:/opt/airflow/pipelines
     - ./utils:/opt/airflow/utils
-    - ./google/nasa-neows-c12d19292fad.json:/opt/airflow/.google/nasa-neows-c12d19292fad.json
     - ./config/secrets.conf:/opt/airflow/config/secrets.conf
   depends_on:
     - postgres
@@ -60,7 +60,7 @@ services:
   airflow-init:
     <<: *airflow-common
     command: >
-      bash -c airflow db init && 
+      bash -c "airflow db init && 
               airflow db upgrade && 
               airflow users create --username admin --firstname admin --lastname admin --role Admin --email airflow@airflow.com --password admin"
     restart: "no"
