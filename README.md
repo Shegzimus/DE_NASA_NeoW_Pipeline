@@ -79,4 +79,4 @@
 
 11. Launch the Airflow web UI
     ```bash
-    open http://localhost:8083
+    open http://localhost:8081
