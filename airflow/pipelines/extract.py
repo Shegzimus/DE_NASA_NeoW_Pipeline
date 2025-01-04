@@ -223,8 +223,8 @@ def extract_and_save_ast_data() -> None:
 
     # Save to CSV & Parquet
     
-    save_df_to_csv(df, file_postfix='neo_browse_asteroid_data', path= 'airflow/data/input/historical/asteroid_data/csv/')
-    save_df_to_parquet(df, file_postfix='neo_browse_asteroid_data', path= 'airflow/data/input/historical/asteroid_data/parquet/')
+    save_df_to_csv(df, file_postfix='neo_browse_asteroid_data', path= 'opt/airflow/data/input/historical/asteroid_data/csv/')
+    save_df_to_parquet(df, file_postfix='neo_browse_asteroid_data', path= 'opt/airflow/data/input/historical/asteroid_data/parquet/')
     return
 
 def fetch_all_ast_pages() -> list:
@@ -334,8 +334,16 @@ def generate_hist_ranges(start_datetime: datetime) -> List[Tuple[str, str, str]]
                                     - end_date_str (str): End date of the week.
                                     - file_postfix (str): A formatted string for file naming.
     """
-    start_date = start_datetime
-    current_date = datetime.now()
+    # from airflow.utils import timezone
+    # start_date = timezone.make_aware(start_datetime)  # Ensure timezone-aware
+    # current_date = timezone.utcnow()  # Get current UTC time as offset-aware
+
+    start_date = start_datetime.replace(tzinfo=None)  # Remove timezone info
+    current_date = datetime.now().replace(tzinfo=None) 
+
+
+    # start_date = start_datetime
+    # current_date = datetime.now()
 
     date_ranges = []
     while start_date <= current_date:
