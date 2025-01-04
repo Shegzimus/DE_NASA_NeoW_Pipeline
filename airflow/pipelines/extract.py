@@ -374,5 +374,93 @@ def save_df_to_parquet(df: pd.json_normalize, file_postfix: str, path: str)-> No
 
 
 
+
+
+
+
+# ======================================= ASYNCHRONOUS ASTEROID EXECUTION =======================================
+# import pandas as pd
+# import asyncio
+
+# def save_df_to_parquet(df: pd.DataFrame, file_postfix: str, path: str) -> None:
+#     """
+#     Saves the DataFrame to a Parquet file with the given postfix and path.
+#     """
+#     output_path = f"{path}/{file_postfix}.parquet"
+#     df.to_parquet(output_path, index=False)
+#     print(f"Data saved to {output_path}")
+
+# async def extract_and_save_ast_data_async(nasa_api_key: str) -> None:
+#     """
+#     Fetches asteroid data from the NASA NEO API and saves it to a Parquet file asynchronously.
+#     """
+#     # Fetch all pages asynchronously
+#     all_asteroid_data = await fetch_all_ast_pages_concurrent(nasa_api_key)
+
+#     # Normalize JSON data to a DataFrame
+#     df = pd.json_normalize(all_asteroid_data)
+
+#     # Save to a Parquet file
+#     save_df_to_parquet(
+#         df, 
+#         file_postfix='neo_browse_asteroid_data', 
+#         path='opt/airflow/data/input/historical/asteroid_data'
+#     )
+
+# # def extract_and_save_ast_data(nasa_api_key: str) -> None:
+# #     """
+# #     Synchronous wrapper for the asynchronous extract_and_save_ast_data_async function.
+# #     """
+# #     asyncio.run(extract_and_save_ast_data_async(nasa_api_key))
+
+
+# import asyncio
+# import aiohttp
+# from tqdm.asyncio import tqdm
+
+# async def fetch_page(session, url):
+#     """
+#     Fetches a single page of data.
+#     """
+#     async with session.get(url) as response:
+#         response.raise_for_status()
+#         return await response.json()
+
+# async def fetch_all_ast_pages_concurrent(nasa_api_key):
+#     """
+#     Fetches all paginated data concurrently from the NASA NEO API.
+
+#     Returns:
+#     list: A list containing all the fetched data from all pages.
+#     """
+#     all_data = []  # To collect data from all pages
+#     base_url = f"http://api.nasa.gov/neo/rest/v1/neo/browse?api_key={nasa_api_key}"
+
+#     async with aiohttp.ClientSession() as session:
+#         # Fetch the first page to get total pages
+#         initial_response = await fetch_page(session, base_url)
+#         total_pages = initial_response.get("page", {}).get("total_pages", 1)
+#         all_data.extend(initial_response.get("near_earth_objects", []))
+
+#         # Create a list of URLs for all pages
+#         urls = [
+#             f"http://api.nasa.gov/neo/rest/v1/neo/browse?page={page}&api_key={nasa_api_key}"
+#             for page in range(2, total_pages + 1)
+#         ]
+
+#         # Fetch all pages concurrently
+#         tasks = [fetch_page(session, url) for url in urls]
+
+#         for task in tqdm(asyncio.as_completed(tasks), total=len(tasks), desc="Fetching Pages", unit="page"):
+#             page_data = await task
+#             all_data.extend(page_data.get("near_earth_objects", []))
+
+#     return all_data
+
+
+
+
+
+
 if __name__ == '__main__':
     pass
