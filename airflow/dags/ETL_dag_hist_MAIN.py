@@ -71,7 +71,7 @@ def extract_dag():
     extract_close_approach_task = PythonOperator(
         task_id="extract_close_approach",
         python_callable=extract_hist_close_approach,
-        op_kwargs={"start_date": '20200101'},
+        op_kwargs={"start_date": datetime(2020, 1, 1)},
     )
     
     extract_neo_feed_task = PythonOperator(
