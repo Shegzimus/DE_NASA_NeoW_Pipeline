@@ -114,3 +114,12 @@
 **Time**: `10:56 AM`
 - Removing the pywin32==308 package from the requirements did the trick. I also had to make sure that the database connection in the .env file pointed to PostgreSQL and not the default SQLite database which Celery was not a fan of.
 - I need to not figure out how to fix the broken DAG error due to the api key only being accessible through the docker secrets.
+
+
+## [2025-01-04]
+**Time**: `12:39 PM`
+- I decided to mount the .conf files and not use docker secrets.
+- On running the containers, I encountered a new error as a result of Airflow timing out because of module imports.
+- I needed to figure out a way to leverage lazy imports in my DAG declarations. Using boilerplate functions in the modules did not help.
+- I was able to use a different DAG declaration style that let me define sets of tasks as functions. Within these functions I was able to locally import the necessary functions from their respective modules, and then used a parent DAG function to string or wrap the DAG functions together.
+- I need to write clear tags so that I can sort them properly on the webserver.
