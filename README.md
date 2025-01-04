@@ -56,27 +56,43 @@
    pip install -r airflow/requirements.txt
    ```
 
-5. Create directories to store your google credentials
+5. Set up your Google Cloud Platform (GCP) account
+   - Visit the GCP Console and create a new project.
+   - Enable the required APIs for your project (e.g., BigQuery, Cloud Storage).
+   - Create a service account with appropriate roles (e.g., BigQuery Admin, Storage Admin).
+   - Download the service account key JSON file.
+
+6. Create directories to store your google credentials
    ```bash
    cd airflow && mkdir -p .google
 
    ```
+   - Move the downloaded service account key JSON file into the .google directory.
+   - Rename the file to "credentials.json" for consistency.
 
-
-
-
-
-
-9.  Build the Docker Image
+7. Install Docker
+   - Download and install Docker from Docker's official website.
+   - After installation, verify Docker is installed correctly by running:
     ```bash
-    docker build -d --
+    docker --version
     ```
 
-10. Start the Docker containers
+8. Verify that docker-compose is installed
+    ```
+    docker-compose --version
+    ```
+
+8. Build the Docker image
+   ```bash
+    docker build -t nasa_neow_pipeline .
+
+   ```
+
+9. Start the Docker containers
     ```bash
     docker-compose up -d
-    ```
+   ```
 
-11. Launch the Airflow web UI
+10. Launch the Airflow web UI
     ```bash
     open http://localhost:8081
