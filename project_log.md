@@ -123,3 +123,9 @@
 - I needed to figure out a way to leverage lazy imports in my DAG declarations. Using boilerplate functions in the modules did not help.
 - I was able to use a different DAG declaration style that let me define sets of tasks as functions. Within these functions I was able to locally import the necessary functions from their respective modules, and then used a parent DAG function to string or wrap the DAG functions together.
 - I need to write clear tags so that I can sort them properly on the webserver.
+
+**Time**: `06:28 PM`
+- I have decided to refactor the pipeline to exclude processing historical asteroid data until I can figure out a faster way to paginate the requests without exceeding the request limit.
+- A small typo (excluding a '.') in the volume config of the docker-compose file not only caused unexpected directory creation, it also copied the google credential as a directory not a file. Of course this caused bucket initialization to fail.
+- Going forward, I think I will also bake the credentials into the image while building from the dockerfile.
+- Since I have exceeded the request limit after pruning all containers, I will need to wait before I restart the pipeline from the extraction phase.
