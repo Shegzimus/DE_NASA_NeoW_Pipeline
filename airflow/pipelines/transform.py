@@ -35,7 +35,7 @@ def transform_neo_feed_raw(filepath: str) -> None:
     # Replace '.' in column names with '_'
     df.columns = df.columns.str.replace('.', '_', regex=False)
 
-    save_path = 'opt/airflow/data/output/historical/neo_feed/'
+    save_path = '/opt/airflow/data/output/historical/neo_feed/'
 
     print(f"\nProcessing file: {filename}\n{'-' *100}")
     print(df.info())
@@ -46,12 +46,11 @@ def transform_hist_neo_feed_in_folder() -> None:
     """
     Walks through the folder and applies the transform_neo_feed_raw function on each file.
     """
-    folder_path = "opt/airflow/data/input/historical/neo_feed/parquet/"  # Path where the files are located
+    folder_path = "/opt/airflow/data/input/historical/neo_feed"  # Path where the files are located
 
     for filename in os.listdir(folder_path):
-        if filename.endswith('.parquet'):  # Only process parquet files
-            file_path = os.path.join(folder_path, filename)  # Get the full file path
-            transform_neo_feed_raw(file_path)  # Pass the full file path to the function
+        file_path = os.path.join(folder_path, filename)  # Get the full file path
+        transform_neo_feed_raw(file_path)  # Pass the full file path to the function
 
 
 
@@ -87,7 +86,7 @@ def transform_hist_approach_in_folder() -> None:
     """
     Walks through the folder and applies the transform_hist_approach_raw function on each file.
     """
-    folder_path= "opt/airflow/data/input/historical/close_approach"
+    folder_path= "/opt/airflow/data/input/historical/close_approach"
 
     for filename in os.listdir(folder_path):
         file_path = os.path.join(folder_path, filename)  # Get the full file path
