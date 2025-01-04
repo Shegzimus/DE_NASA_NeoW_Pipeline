@@ -153,9 +153,10 @@ def load_dag():
     import os
     from airflow.operators.python import PythonOperator
     from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
+    
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
     from pipelines.load import upload_folder_to_gcs
+
     PROJECT_ID = os.environ.get("GCP_PROJECT_ID")
     BUCKET = os.environ.get("GCP_GCS_BUCKET")
     STAGING = os.environ.get("BQ_DATASET_STAGING")
