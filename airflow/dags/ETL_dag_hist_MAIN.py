@@ -14,7 +14,8 @@ default_args = {
     default_args=default_args,
     schedule_interval=None,  # No need to schedule; this is triggered by the parent DAG
     start_date=datetime(2023, 1, 1),
-    catchup=False
+    catchup=False,
+    tags = ['HISTORICAL']
 )
 
 def test_dag():
@@ -51,6 +52,7 @@ test = test_dag()
     schedule_interval=None,  # No need to schedule; this is triggered by the parent DAG
     start_date=datetime(2023, 1, 1),
     catchup=False,
+    tags = ['HISTORICAL'],
     doc_md="""
     ### Extract Phase
     This DAG handles the extraction of historical data from NASA.
@@ -69,7 +71,7 @@ def extract_dag():
     extract_close_approach_task = PythonOperator(
         task_id="extract_close_approach",
         python_callable=extract_hist_close_approach,
-        op_kwargs={"start_date": datetime(2020, 1, 1)},
+        op_kwargs={"start_date": '20200101'},
     )
     
     extract_neo_feed_task = PythonOperator(
@@ -95,6 +97,7 @@ extract = extract_dag()
     schedule_interval=None,
     start_date=datetime(2023, 1, 1),
     catchup=False,
+    tags = ['HISTORICAL'],
     doc_md="""
     ### Transform Phase
     This DAG handles the Transformation of historical data from NASA.
@@ -138,6 +141,7 @@ transform = transform_dag()
     schedule_interval=None,
     start_date=datetime(2023, 1, 1),
     catchup=False,
+    tags = ['HISTORICAL'],
     doc_md="""
     ### Load Phase
     This DAG handles the lading of historical data from the containers into GCS and BQ.
@@ -219,7 +223,8 @@ load = load_dag()
     default_args=default_args,
     schedule_interval=None,
     start_date=datetime(2023, 1, 1),
-    catchup=False
+    catchup=False,
+    tags = ['HISTORICAL']
 )
 def parent_etl_dag():
     from airflow.operators.trigger_dagrun import TriggerDagRunOperator
