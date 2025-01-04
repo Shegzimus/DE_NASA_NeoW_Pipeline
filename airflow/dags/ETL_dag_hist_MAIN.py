@@ -71,19 +71,19 @@ def extract_dag():
     extract_close_approach_task = PythonOperator(
         task_id="extract_close_approach",
         python_callable=extract_hist_close_approach,
-        op_kwargs={"start_date": datetime(2020, 1, 1)},
+        op_kwargs={"start_date": datetime(2024, 1, 1)},
     )
     
     extract_neo_feed_task = PythonOperator(
         task_id="extract_neo_feed",
         python_callable=extract_hist_neo_data_raw,
-        op_kwargs={"start_date": datetime(2020, 1, 1)},
+        op_kwargs={"start_date": datetime(2024, 1, 1)},
     )
     
     extract_ast_data_task = PythonOperator(
         task_id="extract_ast_data",
         python_callable=extract_and_save_ast_data,
-        op_kwargs={"start_date": datetime(2020, 1, 1)},
+        op_kwargs={"start_date": datetime(2024, 1, 1)},
     )
     extract_close_approach_task >> extract_neo_feed_task >> extract_ast_data_task
 
