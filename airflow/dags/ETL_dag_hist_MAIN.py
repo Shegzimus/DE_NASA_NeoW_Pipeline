@@ -1,5 +1,12 @@
 from datetime import datetime, timedelta
 from airflow.decorators import dag
+import os
+
+PROJECT_ID = os.environ.get("GCP_PROJECT_ID")
+BUCKET = os.environ.get("GCP_GCS_BUCKET")
+STAGING = os.environ.get("BQ_DATASET_STAGING")
+WAREHOUSE = os.environ.get("BQ_DATASET_WAREHOUSE")
+
 
 default_args = {
     'owner': 'Oluwasegun',
@@ -115,14 +122,12 @@ def transform_dag():
     
     transform_hist_close_approach_task = PythonOperator(
         task_id="transform_close_approach",
-        python_callable=transform_hist_approach_in_folder,
-        op_kwargs={"start_date": datetime(2020, 1, 1)},
+        python_callable=transform_hist_approach_in_folder
     )
         
     transform_hist_neo_feed_task = PythonOperator(
         task_id="transform_neo_feed",
-        python_callable=transform_hist_neo_feed_in_folder,
-        op_kwargs={"start_date": datetime(2020, 1, 1)},
+        python_callable=transform_hist_neo_feed_in_folder
     )
 
     # transform_hist_ast_task = PythonOperator(
@@ -157,10 +162,7 @@ def load_dag():
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     from pipelines.load import upload_folder_to_gcs
 
-    PROJECT_ID = os.environ.get("GCP_PROJECT_ID")
-    BUCKET = os.environ.get("GCP_GCS_BUCKET")
-    STAGING = os.environ.get("BQ_DATASET_STAGING")
-    WAREHOUSE = os.environ.get("BQ_DATASET_WAREHOUSE")
+    
 
     folder_paths = [
     # {"local_folder": "opt/airflow/data/output/historical/asteroid_data", "gcs_prefix": "historical/asteroid_data/"},
