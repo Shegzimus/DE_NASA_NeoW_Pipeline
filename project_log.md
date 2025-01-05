@@ -129,3 +129,9 @@
 - A small typo (excluding a '.') in the volume config of the docker-compose file not only caused unexpected directory creation, it also copied the google credential as a directory not a file. Of course this caused bucket initialization to fail.
 - Going forward, I think I will also bake the credentials into the image while building from the dockerfile.
 - Since I have exceeded the request limit after pruning all containers, I will need to wait before I restart the pipeline from the extraction phase.
+
+
+## [2025-01-05]
+**Time**: `03:48 PM`
+- The load dag functionality for moving the data from the container to GCS was marked as successful but on bucket inspection, I did not find the files. I'm losing my mind hahaha...
+- Maybe there's a problem with the transformation logic that saves the files in the output directory.
