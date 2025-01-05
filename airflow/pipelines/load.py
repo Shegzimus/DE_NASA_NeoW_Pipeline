@@ -3,7 +3,7 @@ import os
 from google.cloud import storage, bigquery
 from airflow.providers.google.cloud.operators.bigquery import BigQueryCreateEmptyTableOperator
 import pyarrow.parquet as pq
-import gcsfs
+# import gcsfs
 import tqdm
 import datetime
 
@@ -25,13 +25,16 @@ def upload_folder_to_gcs(bucket_name: str, local_folder: str, target_folder_pref
                                          Defaults to an empty string.
     """
     configure_gcs_upload_settings()
+    print(f"Initializing GCS bucket: {bucket_name}")
     bucket = initialize_gcs_bucket(bucket_name)
 
     for root, _, files in os.walk(local_folder):
         for file in files:
             local_file_path = os.path.join(root, file)
             target_file_path = generate_gcs_target_path(local_file_path, local_folder, target_folder_prefix)
+            print(f"Uploading file: {local_file_path} to GCS path: {target_file_path}")
             upload_file_to_gcs(bucket, local_file_path, target_file_path)
+            
 
     print("Upload Successful")
 
