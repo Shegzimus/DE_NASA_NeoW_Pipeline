@@ -50,6 +50,7 @@ def transform_hist_neo_feed_in_folder() -> None:
 
     for filename in os.listdir(folder_path):
         file_path = os.path.join(folder_path, filename)  # Get the full file path
+        print(f"\nProcessing file: {filename}")
         transform_neo_feed_raw(file_path)  # Pass the full file path to the function
 
 
@@ -80,6 +81,8 @@ def transform_hist_approach_raw(filepath: str)-> None:
 
     save_path = 'opt/airflow/data/output/historical/close_approach'
     save_to_parquet_trf(df, filename, save_path)
+    print(f"\n File {filename} saved to {save_path}")
+
 
 
 def transform_hist_approach_in_folder() -> None:
@@ -157,6 +160,7 @@ def transform_hist_asteroid_raw() -> None:
 
     # Save the transformed dataframe to Parquet
     save_to_parquet_trf(df, filename, save_path)
+    print(f"\n File {filename} saved to {save_path}")
 
 
 
