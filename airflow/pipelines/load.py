@@ -24,23 +24,32 @@ def upload_folder_to_gcs(bucket_name: str, local_folder: str, target_folder_pref
     target_folder_prefix (str, optional): The prefix path in GCS where the files will be stored.
                                          Defaults to an empty string.
     """
-    configure_gcs_upload_settings()
-    print(f"Initializing GCS bucket: {bucket_name}")
-    bucket = initialize_gcs_bucket(bucket_name)
+    try:
+        configure_gcs_upload_settings()
+        print(f"Initializing GCS bucket: {bucket_name}")
+        bucket = initialize_gcs_bucket(bucket_name)
+    except Exception as e:
+        print(f"Error initializing GCS bucket: {e}")
+        return
 
-    for root, _, files in os.walk(local_folder):
-        for file in files:
-            local_file_path = os.path.join(root, file)
-            target_file_path = generate_gcs_target_path(local_file_path, local_folder, target_folder_prefix)
-            print(f"Uploading file: {local_file_path} to GCS path: {target_file_path}")
-            upload_file_to_gcs(bucket, local_file_path, target_file_path)
-            
+    try:
+        for root, _, files in os.walk(local_folder):
+            for file in files:
+                local_file_path = os.path.join(root, file)
+                target_file_path = generate_gcs_target_path(local_file_path, local_folder, target_folder_prefix)
+                print(f"Uploading file: {local_file_path} to GCS path: {target_file_path}")
+                try:
+                    upload_file_to_gcs(bucket, local_file_path, target_file_path)
+                except Exception as e:
+                    print(f"Error uploading file {local_file_path}: {e}")
+        print("Upload Successful")
+    except Exception as e:
+        print(f"Error processing folder {local_folder}: {e}")
 
-    print("Upload Successful")
 
 
 
-def upload_file_to_gcs(bucket, local_file_path: str, target_file_path: str)-> None:
+def upload_file_to_gcs(bucket, local_file_path: str, target_file_path: str) -> None:
     """
     This function takes a Google Cloud Storage (GCS) bucket object, a local file path, and a target file path.
     It creates a blob object in the specified bucket using the target file path, then uploads the local file
@@ -51,8 +60,14 @@ def upload_file_to_gcs(bucket, local_file_path: str, target_file_path: str)-> No
     local_file_path (str): The full path of the local file to be uploaded.
     target_file_path (str): The path in the GCS bucket where the file will be stored.
     """
-    blob = bucket.blob(target_file_path)
-    blob.upload_from_filename(local_file_path)
+    try:
+        blob = bucket.blob(target_file_path)
+        blob.upload_from_filename(local_file_path)
+    except FileNotFoundError:
+        print(f"File not found: {local_file_path}")
+    except Exception as e:
+        print(f"Error uploading file {local_file_path} to {target_file_path}: {e}")
+
 
 
 
