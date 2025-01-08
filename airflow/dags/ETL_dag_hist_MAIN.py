@@ -158,7 +158,8 @@ def load_dag():
     import os
     from airflow.operators.python import PythonOperator
     from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
-    
+    from airflow.providers.google.cloud.operators.bigquery import BigQueryInsertJobOperator
+    import json
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     from pipelines.load import upload_folder_to_gcs
 
@@ -195,26 +196,48 @@ def load_dag():
     # write_disposition='WRITE_TRUNCATE'
     # )
 
-    load_hist_neo_to_BQ = GCSToBigQueryOperator(
-    task_id='load_hist_neo_to_BQ',
-    bucket=BUCKET,
-    source_objects='historical/neo_feed/*',
-    destination_project_dataset_table=f'{PROJECT_ID}.{STAGING}.neo_feed',
-    source_format='parquet',
-    schema_object= 'opt/airflow/bq_schema/neo_feed_schema.json',
-    autodetect=False,
-    write_disposition='WRITE_TRUNCATE'
+
+    # Load local schema files
+    with open('/opt/airflow/bq_schema/neo_feed_schema.json') as f:
+        neo_feed_schema = json.load(f)
+    with open('/opt/airflow/bq_schema/close_approach_schema.json') as f:
+        close_approach_schema = json.load(f)
+
+    load_hist_neo_to_BQ = BigQueryInsertJobOperator(
+        task_id='load_hist_neo_to_BQ',
+        configuration={
+            "load": {
+                "sourceUris": [f"gs://{BUCKET}/historical/neo_feed/*"],
+                "destinationTable": {
+                    "projectId": PROJECT_ID,
+                    "datasetId": STAGING,
+                    "tableId": "neo_feed"
+                },
+                "sourceFormat": "PARQUET",
+                "schema": {"fields": neo_feed_schema},
+                "writeDisposition": "WRITE_TRUNCATE"
+            }
+        }
     )
 
-    load_hist_approach_to_BQ = GCSToBigQueryOperator(
-    task_id='load_hist_approach_to_BQ',
-    bucket=BUCKET,
-    source_objects='historical/close_approach/*',
-    destination_project_dataset_table=f'{PROJECT_ID}.{STAGING}.close_approach',
-    source_format='parquet',
-    schema_object= 'opt/airflow/bq_schema/close_approach_schema.json',
-    autodetect=False,
-    write_disposition='WRITE_TRUNCATE'
+
+
+    
+    load_hist_approach_to_BQ = BigQueryInsertJobOperator(
+        task_id='load_hist_approach_to_BQ',
+        configuration={
+            "load": {
+                "sourceUris": [f"gs://{BUCKET}/historical/close_approach/*"],
+                "destinationTable": {
+                    "projectId": PROJECT_ID,
+                    "datasetId": STAGING,
+                    "tableId": "close_approach"
+                },
+                "sourceFormat": "PARQUET",
+                "schema": {"fields": close_approach_schema},
+                "writeDisposition": "WRITE_TRUNCATE"
+            }
+        }
     )
     upload_to_gcs_tasks >> load_hist_neo_to_BQ >> load_hist_approach_to_BQ
 
