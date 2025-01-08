@@ -201,8 +201,8 @@ def load_dag():
     source_objects='historical/neo_feed/*',
     destination_project_dataset_table=f'{PROJECT_ID}.{STAGING}.neo_feed',
     source_format='parquet',
-    autodetect=True,
-    create_disposition='CREATE_IF_NEEDED',
+    schema_object= 'opt/airflow/bq_schema/neo_feed_schema.json',
+    autodetect=False,
     write_disposition='WRITE_TRUNCATE'
     )
 
@@ -212,8 +212,8 @@ def load_dag():
     source_objects='historical/close_approach/*',
     destination_project_dataset_table=f'{PROJECT_ID}.{STAGING}.close_approach',
     source_format='parquet',
-    autodetect=True,
-    create_disposition='CREATE_IF_NEEDED',
+    schema_object= 'opt/airflow/bq_schema/close_approach_schema.json',
+    autodetect=False,
     write_disposition='WRITE_TRUNCATE'
     )
     upload_to_gcs_tasks >> load_hist_neo_to_BQ >> load_hist_approach_to_BQ
