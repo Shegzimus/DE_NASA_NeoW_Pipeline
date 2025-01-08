@@ -1,0 +1,63 @@
+[
+    {
+      "name": "close_approach_date",
+      "type": "DATE",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "close_approach_date_full",
+      "type": "STRING",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "epoch_date_close_approach",
+      "type": "TIMESTAMP",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "orbiting_body",
+      "type": "STRING",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "id",
+      "type": "STRING",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "kilometers_per_second",
+      "type": "FLOAT",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "kilometers_per_hour",
+      "type": "FLOAT",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "miles_per_hour",
+      "type": "FLOAT",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "astronomical",
+      "type": "FLOAT",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "lunar",
+      "type": "FLOAT",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "kilometers",
+      "type": "FLOAT",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "miles",
+      "type": "FLOAT",
+      "mode": "NULLABLE"
+    }
+  ]
+  

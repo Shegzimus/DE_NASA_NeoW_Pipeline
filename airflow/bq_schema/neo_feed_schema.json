@@ -1,0 +1,83 @@
+[
+    {
+      "name": "id",
+      "type": "STRING",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "neo_reference_id",
+      "type": "STRING",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "name",
+      "type": "STRING",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "nasa_jpl_url",
+      "type": "STRING",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "absolute_magnitude_h",
+      "type": "FLOAT",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "is_potentially_hazardous_asteroid",
+      "type": "BOOLEAN",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "is_sentry_object",
+      "type": "BOOLEAN",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "close_approach_date",
+      "type": "DATE",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "estimated_diameter_kilometers_estimated_diameter_min",
+      "type": "FLOAT",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "estimated_diameter_kilometers_estimated_diameter_max",
+      "type": "FLOAT",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "estimated_diameter_meters_estimated_diameter_min",
+      "type": "FLOAT",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "estimated_diameter_meters_estimated_diameter_max",
+      "type": "FLOAT",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "estimated_diameter_miles_estimated_diameter_min",
+      "type": "FLOAT",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "estimated_diameter_miles_estimated_diameter_max",
+      "type": "FLOAT",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "estimated_diameter_feet_estimated_diameter_min",
+      "type": "FLOAT",
+      "mode": "NULLABLE"
+    },
+    {
+      "name": "estimated_diameter_feet_estimated_diameter_max",
+      "type": "FLOAT",
+      "mode": "NULLABLE"
+    }
+  ]
+  
