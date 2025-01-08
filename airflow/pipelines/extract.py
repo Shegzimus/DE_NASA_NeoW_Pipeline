@@ -47,6 +47,7 @@ def extract_batch_neo_data_raw(execution_date: datetime) -> None:
     # Process the API response into a DataFrame
     try:
         df_extracted = extract_dataframe_from_response(data)
+        print(f"Extracted DataFrame:\n{df_extracted.head(4)}")
     except Exception as e:
         print(f"Error processing data into DataFrame: {e}")
         return
@@ -139,6 +140,7 @@ def extract_dataframe_from_response(data: json) -> pd.json_normalize:
             obj['close_approach_date'] = date  # Add date to each object
             all_objects.append(obj)
     df = pd.json_normalize(all_objects)
+
     return df
 
 def generate_time_range(execution_date: datetime) -> tuple[str, str, str]:
@@ -276,8 +278,13 @@ def extract_hist_neo_data_raw(execution_date: datetime)-> None:
             data = request_api_neo_feed(start_date, end_date, API_KEY=nasa_api_key)
         
             df_extracted = extract_dataframe_from_response(data)
+            path = '/opt/airflow/data/input/historical/neo_feed'
+            try:
+                save_df_to_parquet(df_extracted, file_postfix, path)
+                print(f"File {file_postfix} saved sucessfully")
+            except Exception as e:
+                print(f"Error saving file: {e}")
 
-            save_df_to_parquet(df_extracted, file_postfix,'opt/airflow/data/input/historical/neo_feed' )
         except Exception as e:
             print(f"Error processing data for range {start_date} to {end_date}: {e}")
 
@@ -311,8 +318,13 @@ def extract_hist_close_approach(execution_date: datetime)-> None:
             # Convert expanded data to a DataFrame
             close_approach_df = pd.DataFrame(close_approach_expanded)
 
-            # Save the extracted data PQ 
-            save_df_to_parquet(close_approach_df, file_postfix, 'opt/airflow/data/input/historical/close_approach')
+            # Save the extracted data PQ
+            path =  '/opt/airflow/data/input/historical/close_approach'
+            try:
+                save_df_to_parquet(close_approach_df, file_postfix, path)
+                print(f"File {file_postfix} saved sucessfully")
+            except Exception as e:
+                print(f"Error saving file: {e}")
         except Exception as e:
             print(f"Error processing close approach data for range {start_date} to {end_date}: {e}")
 
@@ -363,12 +375,17 @@ def generate_hist_ranges(start_datetime: datetime) -> List[Tuple[str, str, str]]
     return date_ranges
 
 
+
+
+
 def save_df_to_parquet(df: pd.json_normalize, file_postfix: str, path: str)-> None:
     """
     Save the DataFrame to a Parquet file.
     """
     filepath = f"{path}/{file_postfix}.parquet"
     df.to_parquet(filepath, index=False)
+    print(f"Saving file to: {filepath}")
+
     return
 
 
