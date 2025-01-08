@@ -7,6 +7,7 @@ x-airflow-common:
     - airflow.env
   volumes:
     - ./.google/nasa-neows-c12d19292fad.json:/opt/airflow/.google/nasa-neows-c12d19292fad.json  
+    - ./bq_schema:/opt/airflow/bq_schema
     - ./config:/opt/airflow/config
     - ./dags:/opt/airflow/dags
     - ./data:/opt/airflow/data
