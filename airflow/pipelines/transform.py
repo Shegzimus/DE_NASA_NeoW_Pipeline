@@ -25,22 +25,27 @@ def transform_neo_feed_raw(filepath: str) -> None:
     """
     Use the helper functions to transform a single file and save as parquet
     """
-    df, filename = parse_parquet(filepath)
+    try:
+        df, filename = parse_parquet(filepath)
 
-    df = drop_columns(df, 'links.self', 'sentry_data', 'close_approach_data')
-    df = cols_to_datetime(df, 'close_approach_date')
-    df = cols_to_string(df, 'name', 'nasa_jpl_url')
-    df = drop_duplicates(df, subset=['id', 'name'])
+        df = drop_columns(df, 'links.self', 'sentry_data', 'close_approach_data')
+        df = cols_to_datetime(df, 'close_approach_date')
+        df = cols_to_string(df, 'name', 'nasa_jpl_url')
+        df = drop_duplicates(df, subset=['id', 'name'])
 
-    # Replace '.' in column names with '_'
-    df.columns = df.columns.str.replace('.', '_', regex=False)
+        # Replace '.' in column names with '_'
+        df.columns = df.columns.str.replace('.', '_', regex=False)
 
-    save_path = '/opt/airflow/data/output/historical/neo_feed/'
+        save_path = '/opt/airflow/data/output/historical/neo_feed/'
+        
+        try:
+                save_to_parquet_trf(df, filename, save_path)
+                print(f"File {filename} saved to output folder successfully")
+        except Exception as e:
+                print(f"Error saving file {e}")
 
-    print(f"\nProcessing file: {filename}\n{'-' *100}")
-    print(df.info())
-    save_to_parquet_trf(df, filename, save_path)
-
+    except Exception as e:
+        print(f"Error transforming neo file: {e}")
 
 def transform_hist_neo_feed_in_folder() -> None:
     """
@@ -67,22 +72,26 @@ def transform_hist_approach_raw(filepath: str)-> None:
     Use the helper functions to transform a single file and save as parquet
     
     """
+    try:
+        df, filename= parse_parquet(filepath)
+        df = drop_duplicates(df, subset=['id', 'close_approach_date', 'close_approach_date_full'])
+        df = drop_columns(df, 'orbiting_body')
 
-    df, filename= parse_parquet(filepath)
-    df = drop_duplicates(df, subset=['id', 'close_approach_date', 'close_approach_date_full'])
-    df = drop_columns(df, 'orbiting_body')
+        df = cols_to_datetime(df, 'close_approach_date', 'close_approach_date_full')
+        df = cols_to_int(df, 'id')
 
-    df = cols_to_datetime(df, 'close_approach_date', 'close_approach_date_full')
-    df = cols_to_int(df, 'id')
+        # Replace '.' in column names with '_'
+        df.columns = df.columns.str.replace('.', '_', regex=False)
+        print(df.info())
 
-    # Replace '.' in column names with '_'
-    df.columns = df.columns.str.replace('.', '_', regex=False)
-    print(df.info())
-
-    save_path = 'opt/airflow/data/output/historical/close_approach'
-    save_to_parquet_trf(df, filename, save_path)
-    print(f"\n File {filename} saved to {save_path}")
-
+        save_path = '/opt/airflow/data/output/historical/close_approach'
+        try:
+            save_to_parquet_trf(df, filename, save_path)
+            print(f"File {filename} saved to output folder successfully")
+        except Exception as e:
+            print(f"Error saving file {e}")
+    except Exception as e:
+        print(f"Error transforming approach file: {e}")
 
 
 def transform_hist_approach_in_folder() -> None:
@@ -108,11 +117,10 @@ def transform_hist_asteroid_raw() -> None:
     """
 
     # paths
-    filepath = 'opt/airflow/data/input/historical/asteroid_data/parquet/neo_browse_asteroid_data.parquet'
-    save_path = 'opt/airflow/data/output/historical/asteroid_data/'
+    read_path = '/opt/airflow/data/input/historical/asteroid_data/parquet/neo_browse_asteroid_data.parquet'
+    save_path = '/opt/airflow/data/output/historical/asteroid_data/'
 
-    # Parse parquet file
-    df, filename = parse_parquet(filepath)
+    df, filename = parse_parquet(read_path)
 
     df = df.dropna(subset=['id'])
 
@@ -175,8 +183,8 @@ def transform_batch_close_approach(execution_date: datetime) -> None:
     
 
     start_date, end_date, file_postfix = generate_time_range(execution_date)
-    filepath = f'airflow/data/input/batch/close_approach/parquet/{file_postfix}.parquet'
-    df, filename= parse_parquet(filepath)
+    read_path = f'airflow/data/input/batch/close_approach/parquet/{file_postfix}.parquet'
+    df, filename= parse_parquet(read_path)
 
     df = drop_columns(df, 'orbiting_body')
     df = drop_duplicates(df, subset=['id', 'close_approach_date', 'close_approach_date_full'])
@@ -201,8 +209,8 @@ def transform_neo_feed_batch(execution_date: datetime) -> None:
     Use the helper functions to transform a single file and save as parquet
     """
     start_date, end_date, file_postfix = generate_time_range(execution_date)
-    filepath = f'opt/airflow/data/input/batch/neo_feed/parquet/{file_postfix}.parquet'
-    df, filename= parse_parquet(filepath)
+    read_path = f'opt/airflow/data/input/batch/neo_feed/parquet/{file_postfix}.parquet'
+    df, filename= parse_parquet(read_path)
 
     df = drop_columns(df, 'links.self', 'sentry_data', 'close_approach_data')
     df = cols_to_datetime(df, 'close_approach_date')
