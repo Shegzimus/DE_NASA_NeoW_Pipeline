@@ -35,6 +35,7 @@ def transform_neo_feed_raw(filepath: str) -> None:
 
         # Replace '.' in column names with '_'
         df.columns = df.columns.str.replace('.', '_', regex=False)
+        print(df.info())
 
         save_path = '/opt/airflow/data/output/historical/neo_feed/'
         
