@@ -4,8 +4,8 @@ import os
 
 PROJECT_ID = os.environ.get("GCP_PROJECT_ID")
 BUCKET = os.environ.get("GCP_GCS_BUCKET")
-STAGING = os.environ.get("BQ_DATASET_STAGING")
-WAREHOUSE = os.environ.get("BQ_DATASET_WAREHOUSE")
+STAGING = os.environ.get("BIGQUERY_STAGING_DATASET")
+WAREHOUSE = os.environ.get("BIGQUERY_WAREHOUSE_DATASET")
 
 
 default_args = {
@@ -166,8 +166,8 @@ def load_dag():
 
     folder_paths = [
     # {"local_folder": "opt/airflow/data/output/historical/asteroid_data", "gcs_prefix": "historical/asteroid_data/"},
-    {"local_folder": "opt/airflow/data/output/historical/close_approach", "gcs_prefix": "historical/close_approach/"},
-    {"local_folder": "opt/airflow/data/output/historical/neo_feed", "gcs_prefix": "historical/neo_feed/"}
+    {"local_folder": "/opt/airflow/data/output/historical/close_approach", "gcs_prefix": "historical/close_approach/"},
+    {"local_folder": "/opt/airflow/data/output/historical/neo_feed", "gcs_prefix": "historical/neo_feed/"}
     ]
 
     upload_to_gcs_tasks = []
