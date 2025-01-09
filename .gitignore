@@ -34,3 +34,4 @@ directory_structure.txt
 neo_browse_asteroid_data.csv
 airflow/pipelines/asynch_lab.py
 output.tf
+airflow/pipelines/schemalab.py
