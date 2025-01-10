@@ -75,12 +75,12 @@ def transform_hist_approach_raw(filepath: str)-> None:
     """
     try:
         df, filename= parse_parquet(filepath)
-        df = drop_duplicates(df, subset=['id', 'close_approach_date', 'close_approach_date_full'])
-        df = drop_columns(df, 'orbiting_body')
+        df = drop_duplicates(df, subset=['id', 'close_approach_date'])
+        df = drop_columns(df, 'orbiting_body', 'close_approach_date_full')
 
-        df = cols_to_datetime(df, 'close_approach_date', 'close_approach_date_full')
-        df = cols_to_int(df, 'id')
-
+        df = cols_to_datetime(df, 'close_approach_date')
+        # df = cols_to_int(df, 'id')
+        
         # Replace '.' in column names with '_'
         df.columns = df.columns.str.replace('.', '_', regex=False)
         df = cols_to_float(df, 'kilometers_per_second', 'kilometers_per_hour', 'miles_per_hour', 'astronomical', 'lunar', 'kilometers', 'miles' )
@@ -302,7 +302,9 @@ def cols_to_datetime(df: pd.DataFrame, *args) -> pd.DataFrame:
     """
     for col in args:
         # Explicitly parse dates using pd.to_datetime
-        df[col] = pd.to_datetime(df[col], errors='coerce')  # Ensures invalid dates turn into NaT
+        df[col] = pd.to_datetime(df[col], errors='coerce')
+        df[col].fillna(pd.Timestamp("1970-01-01"), inplace=True)
+        df[col] = (df[col] - pd.Timestamp("1970-01-01")).dt.days.astype("int32")
     return df
 
 
