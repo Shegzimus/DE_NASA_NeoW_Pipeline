@@ -365,6 +365,26 @@ def cols_to_int(df: pd.DataFrame, *args) -> pd.DataFrame:
     df[list(args)] = df[list(args)].astype(int)  # Convert to integer
     return df
 
+
+def cols_to_float(df: pd.DataFrame, *args) -> pd.DataFrame:
+    """
+    Converts specified columns to float data type in a Pandas DataFrame, ensuring compatibility with BigQuery's DOUBLE type.
+
+    Parameters:
+    df (pd.DataFrame): The DataFrame where the columns are to be converted.
+    *args: Variable length argument list. Each argument represents a column name to be converted to float.
+
+    Returns:
+    pd.DataFrame: The modified DataFrame with specified columns converted to float data type.
+    """
+    for col in args:
+        # Coerce invalid values to NaN and convert to float
+        df[col] = pd.to_numeric(df[col], errors='coerce').astype('float64')
+        
+        # Optional: Fill NaN with a default value (e.g., 0.0 or another placeholder)
+        df[col].fillna(0.0, inplace=True)
+    return df
+
 # Save transformed file to parquet
 def save_to_parquet_trf(df: pd.DataFrame, filename: str, save_path: str) -> None: 
     """
