@@ -83,6 +83,8 @@ def transform_hist_approach_raw(filepath: str)-> None:
 
         # Replace '.' in column names with '_'
         df.columns = df.columns.str.replace('.', '_', regex=False)
+        df = cols_to_float(df, 'kilometers_per_second', 'kilometers_per_hour', 'miles_per_hour', 'astronomical', 'lunar', 'kilometers', 'miles' )
+
         print(df.info())
 
         save_path = '/opt/airflow/data/output/historical/close_approach'
