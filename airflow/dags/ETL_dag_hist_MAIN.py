@@ -17,7 +17,7 @@ default_args = {
 
 
 @dag(
-    dag_id="test_phase",
+    dag_id="2_test_phase",
     default_args=default_args,
     schedule_interval=None,  # No need to schedule; this is triggered by the parent DAG
     start_date=datetime(2023, 1, 1),
@@ -54,7 +54,7 @@ def test_dag():
 test = test_dag()
 
 @dag(
-    dag_id="extract_phase",
+    dag_id="3_extract_phase",
     default_args=default_args,
     schedule_interval=None,  # No need to schedule; this is triggered by the parent DAG
     start_date=datetime(2023, 1, 1),
@@ -99,7 +99,7 @@ extract = extract_dag()
 
 
 @dag(
-    dag_id="transform_phase",
+    dag_id="4_transform_phase",
     default_args=default_args,
     schedule_interval=None,
     start_date=datetime(2023, 1, 1),
@@ -141,7 +141,7 @@ transform = transform_dag()
 
 
 @dag(
-    dag_id="load_phase",
+    dag_id="5_load_phase",
     default_args=default_args,
     schedule_interval=None,
     start_date=datetime(2023, 1, 1),
@@ -245,7 +245,7 @@ load = load_dag()
 
 
 @dag(
-    dag_id="parent_etl_dag",
+    dag_id="1_parent_etl_dag",
     default_args=default_args,
     schedule_interval=None,
     start_date=datetime(2023, 1, 1),
