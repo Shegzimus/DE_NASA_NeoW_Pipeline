@@ -30,8 +30,9 @@ terraform/terraform.tfstate.backup
 
 directory_structure.txt
 
-
+# Junk files
 neo_browse_asteroid_data.csv
 airflow/pipelines/asynch_lab.py
 output.tf
 airflow/pipelines/schemalab.py
+neo_feed_schema.json
