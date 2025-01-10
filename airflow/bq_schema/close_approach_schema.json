@@ -4,11 +4,7 @@
       "type": "DATE",
       "mode": "NULLABLE"
     },
-    {
-      "name": "close_approach_date_full",
-      "type": "STRING",
-      "mode": "NULLABLE"
-    },
+
     {
       "name": "epoch_date_close_approach",
       "type": "TIMESTAMP",
