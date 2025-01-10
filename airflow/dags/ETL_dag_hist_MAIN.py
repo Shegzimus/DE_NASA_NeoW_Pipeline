@@ -214,6 +214,10 @@ def load_dag():
                     "tableId": "neo_feed"
                 },
                 "sourceFormat": "PARQUET",
+                "timePartitioning": {
+                "type": "MONTH",
+                "field": "close_approach_date"
+                },
                 "schema": {"fields": neo_feed_schema},
                 "writeDisposition": "WRITE_TRUNCATE"
             }
@@ -234,6 +238,10 @@ def load_dag():
                     "tableId": "close_approach"
                 },
                 "sourceFormat": "PARQUET",
+                "timePartitioning": {
+                "type": "MONTH",
+                "field": "close_approach_date"
+                },
                 "schema": {"fields": close_approach_schema},
                 "writeDisposition": "WRITE_TRUNCATE"
             }
@@ -257,22 +265,22 @@ def parent_etl_dag():
 
     trigger_test = TriggerDagRunOperator(
         task_id="trigger_test",
-        trigger_dag_id="test_phase",
+        trigger_dag_id="2_test_phase",
     )
 
     trigger_extract = TriggerDagRunOperator(
         task_id="trigger_extract",
-        trigger_dag_id="extract_phase",
+        trigger_dag_id="3_extract_phase",
     )
     
     trigger_transform = TriggerDagRunOperator(
         task_id="trigger_transform",
-        trigger_dag_id="transform_phase",
+        trigger_dag_id="4_transform_phase",
     )
     
     trigger_load = TriggerDagRunOperator(
         task_id="trigger_load",
-        trigger_dag_id="load_phase",
+        trigger_dag_id="5_load_phase",
     )
     
     trigger_test >> trigger_extract >> trigger_transform >> trigger_load
