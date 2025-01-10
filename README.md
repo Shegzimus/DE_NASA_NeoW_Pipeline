@@ -117,7 +117,7 @@ This project demonstrates best practices in modern data engineering and serves a
 
 3. Activate the virtual environment
     ```bash
-    source venv/bin/activate
+    source venv/scripts/activate
     ```
 
 4. Install dependencies
