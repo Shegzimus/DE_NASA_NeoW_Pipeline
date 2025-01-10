@@ -135,3 +135,11 @@
 **Time**: `03:48 PM`
 - The load dag functionality for moving the data from the container to GCS was marked as successful but on bucket inspection, I did not find the files. I'm losing my mind hahaha...
 - Maybe there's a problem with the transformation logic that saves the files in the output directory.
+
+## [2025-01-10]
+**Time**: `09:09 AM`
+- I used opkwargs to insert the wrong argument into the extraction function. Instead of execution_date, I passed in start_date which caused nothing to be passed into the function. No date means nothing was queries so no data was extracted into the container directory.
+- After passing the right argument name, the extraction logic worked properly.
+- There is still a schema mismatch between bigquery and airflow. 
+- Bigquery expect cpp_type INT32 and not INT64.
+- I need to device a sure way to generate a bqschema in the form of a json file, from transformed columns and pass that into BQ ahead of the final upload.
