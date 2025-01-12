@@ -149,7 +149,7 @@ transform = transform_dag()
     tags = ['HISTORICAL'],
     doc_md="""
     ### Load Phase
-    This DAG handles the lading of historical data from the containers into GCS and BQ.
+    This DAG handles the loading of historical data from the containers into GCS and BQ.
     """
 )
 
@@ -203,8 +203,8 @@ def load_dag():
     with open('/opt/airflow/bq_schema/close_approach_schema.json') as f:
         close_approach_schema = json.load(f)
 
-    load_hist_neo_to_BQ = BigQueryInsertJobOperator(
-        task_id='load_hist_neo_to_BQ',
+    stage_hist_neo_feed = BigQueryInsertJobOperator(
+        task_id='stage_hist_neo_feed',
         configuration={
             "load": {
                 "sourceUris": [f"gs://{BUCKET}/historical/neo_feed/*"],
@@ -227,8 +227,8 @@ def load_dag():
 
 
     
-    load_hist_approach_to_BQ = BigQueryInsertJobOperator(
-        task_id='load_hist_approach_to_BQ',
+    stage_hist_approach_data = BigQueryInsertJobOperator(
+        task_id='stage_hist_approach_data',
         configuration={
             "load": {
                 "sourceUris": [f"gs://{BUCKET}/historical/close_approach/*"],
@@ -247,10 +247,41 @@ def load_dag():
             }
         }
     )
-    upload_to_gcs_tasks >> load_hist_neo_to_BQ >> load_hist_approach_to_BQ
+
+    upload_to_gcs_tasks >> stage_hist_neo_feed >> stage_hist_approach_data
 
 load = load_dag()
 
+
+@dag(
+    dag_id="6_sql_workflow",
+    default_args=default_args,
+    schedule_interval=None,
+    start_date=datetime(2023, 1, 1),
+    catchup=False,
+    tags = ['HISTORICAL'],
+    doc_md="""
+    ### SQL Workflow
+    This DAG handles the SQL processing of datasets from the staging layer to the warehouse layer.
+    """
+)
+
+def sql_dag():
+    import sys
+    import os
+    from airflow.operators.python import PythonOperator    
+
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from pipelines.sql import execute_sql_from_file
+
+    sql_neo_feed_query = PythonOperator(
+        task_id="sql_neo_feed_query",
+        python_callable=execute_sql_from_file,
+        op_kwargs={
+            "sql_file_path": "/opt/airflow/sql/neo_feed_query.sql",
+            "destination_table": f"{PROJECT_ID}.{WAREHOUSE}.neo_feed_summary"
+        }
+    )
 
 @dag(
     dag_id="1_parent_etl_dag",
