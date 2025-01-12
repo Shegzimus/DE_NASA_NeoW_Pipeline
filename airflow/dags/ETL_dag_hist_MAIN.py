@@ -157,7 +157,6 @@ def load_dag():
     import sys
     import os
     from airflow.operators.python import PythonOperator
-    from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
     from airflow.providers.google.cloud.operators.bigquery import BigQueryInsertJobOperator
     import json
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
