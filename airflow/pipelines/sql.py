@@ -5,10 +5,13 @@ import sys
 
 def execute_sql_from_file(sql_file_path):
     """Reads and executes a SQL query from a file using BigQuery."""
-    # Initialize BigQuery client
+    
+    if not os.path.isfile(sql_file_path):
+        print(f"Error: {sql_file_path} does not exist. Please ensure the file exists and is accessible.")
+        sys.exit(1)
+
     client = initialize_bigquery()
 
-    # Read the SQL query from the file
     query = read_sql_from_file(sql_file_path)
 
     # Execute the query
@@ -24,12 +27,9 @@ def initialize_bigquery():
 
 def read_sql_from_file(sql_file_path):
     """Reads and returns a SQL query from a file."""
-    try:
-        with open(sql_file_path, 'r') as file:
-            return file.read()
-    except:
-        print(f"Error reading SQL query from {sql_file_path}. Please ensure the file exists and is accessible.")
-        sys.exit(1)
+    with open(sql_file_path, 'r') as file:
+        return file.read()
+
 
 
 
