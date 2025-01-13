@@ -15,7 +15,6 @@ from pipelines.extract import (generate_time_range,
                                 extract_dataframe_from_response,  extract_batch_close_approach,
                                 request_api_neo_feed,
                                 extract_dataframe_from_response,
-                                save_df_to_csv,
                                 save_df_to_parquet,
                                 generate_hist_ranges)
 from utils.constants import nasa_api_key
