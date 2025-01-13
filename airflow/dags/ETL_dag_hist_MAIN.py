@@ -17,6 +17,43 @@ default_args = {
 
 
 @dag(
+    dag_id="1_parent_etl_dag",
+    default_args=default_args,
+    schedule_interval=None,
+    start_date=datetime(2023, 1, 1),
+    catchup=False,
+    tags = ['HISTORICAL']
+)
+def parent_etl_dag():
+    from airflow.operators.trigger_dagrun import TriggerDagRunOperator
+
+    trigger_test = TriggerDagRunOperator(
+        task_id="trigger_test",
+        trigger_dag_id="2_test_phase",
+    )
+
+    trigger_extract = TriggerDagRunOperator(
+        task_id="trigger_extract",
+        trigger_dag_id="3_extract_phase",
+    )
+    
+    trigger_transform = TriggerDagRunOperator(
+        task_id="trigger_transform",
+        trigger_dag_id="4_transform_phase",
+    )
+    
+    trigger_load = TriggerDagRunOperator(
+        task_id="trigger_load",
+        trigger_dag_id="5_load_phase",
+    )
+    
+    trigger_test >> trigger_extract >> trigger_transform >> trigger_load
+
+etl_dag = parent_etl_dag()
+
+
+
+@dag(
     dag_id="2_test_phase",
     default_args=default_args,
     schedule_interval=None,  # No need to schedule; this is triggered by the parent DAG
@@ -282,37 +319,3 @@ def sql_dag():
         }
     )
 
-@dag(
-    dag_id="1_parent_etl_dag",
-    default_args=default_args,
-    schedule_interval=None,
-    start_date=datetime(2023, 1, 1),
-    catchup=False,
-    tags = ['HISTORICAL']
-)
-def parent_etl_dag():
-    from airflow.operators.trigger_dagrun import TriggerDagRunOperator
-
-    trigger_test = TriggerDagRunOperator(
-        task_id="trigger_test",
-        trigger_dag_id="2_test_phase",
-    )
-
-    trigger_extract = TriggerDagRunOperator(
-        task_id="trigger_extract",
-        trigger_dag_id="3_extract_phase",
-    )
-    
-    trigger_transform = TriggerDagRunOperator(
-        task_id="trigger_transform",
-        trigger_dag_id="4_transform_phase",
-    )
-    
-    trigger_load = TriggerDagRunOperator(
-        task_id="trigger_load",
-        trigger_dag_id="5_load_phase",
-    )
-    
-    trigger_test >> trigger_extract >> trigger_transform >> trigger_load
-
-etl_dag = parent_etl_dag()
