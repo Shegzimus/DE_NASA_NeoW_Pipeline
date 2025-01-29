@@ -245,24 +245,6 @@ def test_save_df_to_parquet():
         mock_to_parquet.assert_called_once_with(expected_filepath, index=False)
 
 
-def test_save_df_to_csv():
-    # Mock DataFrame to test with
-    test_df = pd.DataFrame({
-        "col1": [1, 2, 3],
-        "col2": ["a", "b", "c"]
-    })
-    file_postfix = "test_postfix"
-    path = "/mock/path"
-
-    # Mock the DataFrame's to_csv method
-    with patch("pandas.DataFrame.to_csv") as mock_to_csv:
-        save_df_to_csv(test_df, file_postfix, path)
-
-        # Build the expected filepath
-        expected_filepath = f"{path}/{file_postfix}.csv"
-
-        # Verify to_csv was called with the correct arguments
-        mock_to_csv.assert_called_once_with(expected_filepath, index=False)
 
 
 

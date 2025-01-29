@@ -56,7 +56,7 @@ etl_dag = parent_etl_dag()
 @dag(
     dag_id="2_test_phase",
     default_args=default_args,
-    schedule_interval=None,  # No need to schedule; this is triggered by the parent DAG
+    schedule_interval=None,
     start_date=datetime(2023, 1, 1),
     catchup=False,
     tags = ['HISTORICAL']
@@ -93,7 +93,7 @@ test = test_dag()
 @dag(
     dag_id="3_extract_phase",
     default_args=default_args,
-    schedule_interval=None,  # No need to schedule; this is triggered by the parent DAG
+    schedule_interval=None,
     start_date=datetime(2023, 1, 1),
     catchup=False,
     tags = ['HISTORICAL'],
