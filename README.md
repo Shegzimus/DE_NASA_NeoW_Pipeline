@@ -3,7 +3,6 @@
 # Table of Contents
 
 - [Table of Contents](#table-of-contents)
-  - [Motivation and Objectives](#motivation-and-objectives)
   - [Overview](#overview)
     - [Key Features](#key-features)
     - [Architecture Overview](#architecture-overview)
@@ -12,8 +11,6 @@
   - [Prerequisites](#prerequisites)
   - [System Configuration](#system-configuration)
 
-
-## Motivation and Objectives
 
 ---
 ## Overview
